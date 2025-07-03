@@ -9,6 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          current_streak: number
+          id: string
+          last_completed_date: string | null
+          name: string
+          notifications_enabled: boolean
+          theme_preference: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number
+          id: string
+          last_completed_date?: string | null
+          name: string
+          notifications_enabled?: boolean
+          theme_preference?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_completed_date?: string | null
+          name?: string
+          notifications_enabled?: boolean
+          theme_preference?: string | null
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           category: string
@@ -44,7 +98,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_user_streak: {
+        Args: { user_uuid: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,22 +7,21 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Plus } from 'lucide-react';
+import { Plus, Calendar } from 'lucide-react';
+
+interface Category {
+  id: string;
+  name: string;
+  color: string;
+}
 
 interface TaskFormProps {
   onTaskAdded: () => void;
 }
 
-const categories = [
-  'Programming',
-  'Mechatronics & Tech',
-  'Schoolwork',
-  'Business Learning'
-];
-
 const days = [
   'Monday',
-  'Tuesday',
+  'Tuesday', 
   'Wednesday',
   'Thursday',
   'Friday',
@@ -31,43 +30,86 @@ const days = [
 ];
 
 const TaskForm = ({ onTaskAdded }: TaskFormProps) => {
-  const [name, setName] = useState('');
+  const [taskName, setTaskName] = useState('');
   const [category, setCategory] = useState('');
   const [day, setDay] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      setCategories(data || []);
+      
+      // Set first category as default if available
+      if (data && data.length > 0 && !category) {
+        setCategory(data[0].name);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error loading categories",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !category || !day) return;
+    if (!taskName.trim() || !category || !day) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all fields.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+      if (!user) {
+        toast({
+          title: "Authentication error",
+          description: "Please log in to add tasks.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const { error } = await supabase
         .from('tasks')
         .insert({
-          name,
+          user_id: user.id,
+          name: taskName.trim(),
           category,
           day,
-          user_id: user.id,
+          completed: false
         });
 
       if (error) throw error;
 
-      setName('');
-      setCategory('');
+      setTaskName('');
       setDay('');
       onTaskAdded();
+      
       toast({
         title: "Task added!",
-        description: `Added "${name}" to ${day}`,
+        description: `Added "${taskName}" to ${day}`,
       });
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: "Error adding task",
         description: error.message,
         variant: "destructive",
       });
@@ -77,9 +119,9 @@ const TaskForm = ({ onTaskAdded }: TaskFormProps) => {
   };
 
   return (
-    <Card className="shadow-lg border-purple-200 bg-white/50 backdrop-blur-sm">
+    <Card className="shadow-lg border-purple-200 dark:border-purple-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm transition-colors duration-300">
       <CardHeader>
-        <CardTitle className="text-xl text-purple-800 flex items-center gap-2">
+        <CardTitle className="text-xl text-purple-800 dark:text-purple-200 flex items-center gap-2">
           <Plus className="w-5 h-5" />
           Add New Task
         </CardTitle>
@@ -87,27 +129,33 @@ const TaskForm = ({ onTaskAdded }: TaskFormProps) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="taskName" className="text-purple-700">Task Name</Label>
+            <Label htmlFor="taskName" className="text-purple-700 dark:text-purple-300 font-medium">Task Name</Label>
             <Input
               id="taskName"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={taskName}
+              onChange={(e) => setTaskName(e.target.value)}
               placeholder="Enter task name"
               required
-              className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+              className="border-purple-200 dark:border-purple-700 focus:border-purple-400 focus:ring-purple-400 dark:bg-gray-700 dark:text-white transition-colors"
             />
           </div>
-          
+
           <div className="space-y-2">
-            <Label className="text-purple-700">Category</Label>
+            <Label className="text-purple-700 dark:text-purple-300 font-medium">Category</Label>
             <Select value={category} onValueChange={setCategory} required>
-              <SelectTrigger className="border-purple-200 focus:border-purple-400 focus:ring-purple-400">
+              <SelectTrigger className="border-purple-200 dark:border-purple-700 focus:border-purple-400 focus:ring-purple-400 dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-gray-800 dark:border-purple-700">
                 {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
+                  <SelectItem key={cat.id} value={cat.name} className="dark:text-white dark:focus:bg-purple-700">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: cat.color }}
+                      />
+                      {cat.name}
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -115,14 +163,17 @@ const TaskForm = ({ onTaskAdded }: TaskFormProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-purple-700">Day</Label>
+            <Label className="text-purple-700 dark:text-purple-300 font-medium flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Day
+            </Label>
             <Select value={day} onValueChange={setDay} required>
-              <SelectTrigger className="border-purple-200 focus:border-purple-400 focus:ring-purple-400">
+              <SelectTrigger className="border-purple-200 dark:border-purple-700 focus:border-purple-400 focus:ring-purple-400 dark:bg-gray-700 dark:text-white">
                 <SelectValue placeholder="Select day" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-gray-800 dark:border-purple-700">
                 {days.map((d) => (
-                  <SelectItem key={d} value={d}>
+                  <SelectItem key={d} value={d} className="dark:text-white dark:focus:bg-purple-700">
                     {d}
                   </SelectItem>
                 ))}
@@ -132,10 +183,20 @@ const TaskForm = ({ onTaskAdded }: TaskFormProps) => {
 
           <Button
             type="submit"
-            disabled={loading || !name || !category || !day}
-            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg transform transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
           >
-            {loading ? 'Adding...' : 'Add Task'}
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Adding...
+              </div>
+            ) : (
+              <>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Task
+              </>
+            )}
           </Button>
         </form>
       </CardContent>
