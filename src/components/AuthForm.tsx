@@ -38,27 +38,36 @@ const AuthForm = ({ onAuthSuccess }: AuthFormProps) => {
           description: "Successfully signed in to your account.",
         });
       } else {
-        const { error } = await supabase.auth.signUp({
+        // For signup, we need to handle email confirmation properly
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
               name: name || 'User'
-            },
-            emailRedirectTo: undefined // Disable email verification
+            }
           }
         });
         
         if (error) throw error;
         
-        toast({
-          title: "Account created!",
-          description: "Welcome to Pathway Quest! Let's boost your productivity.",
-        });
+        // Check if email confirmation is required
+        if (data.user && !data.session) {
+          toast({
+            title: "Check your email",
+            description: "Please check your email and click the confirmation link to complete your signup.",
+          });
+        } else {
+          toast({
+            title: "Account created!",
+            description: "Welcome to Pathway Quest! Let's boost your productivity.",
+          });
+        }
       }
       
       onAuthSuccess();
     } catch (error: any) {
+      console.error('Auth error:', error);
       toast({
         title: isLogin ? "Sign in failed" : "Sign up failed",
         description: error.message,
@@ -97,7 +106,7 @@ const AuthForm = ({ onAuthSuccess }: AuthFormProps) => {
           </div>
           <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-lg p-3 border border-purple-200 dark:border-purple-700">
             <Mail className="w-6 h-6 text-purple-600 mx-auto mb-1" />
-            <p className="text-xs text-gray-600 dark:text-gray-300">Partners</p>
+            <p className="text-xs text-gray-600 dark:text-gary-300">Partners</p>
           </div>
         </div>
 
@@ -203,13 +212,11 @@ const AuthForm = ({ onAuthSuccess }: AuthFormProps) => {
               </button>
             </div>
             
-            {!isLogin && (
-              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-700 text-center">
-                  ✨ No email verification required - start immediately!
-                </p>
-              </div>
-            )}
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700 text-center">
+                ℹ️ If you can't sign in after signup, check your email for a confirmation link or contact support.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
