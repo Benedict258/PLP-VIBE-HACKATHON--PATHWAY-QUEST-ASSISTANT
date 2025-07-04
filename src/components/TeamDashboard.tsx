@@ -74,16 +74,21 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
     if (!selectedTeam) return;
 
     try {
+      // Simplified query without profiles join for now
       const { data, error } = await supabase
         .from('team_members')
-        .select(`
-          *,
-          profiles!inner(name)
-        `)
+        .select('*')
         .eq('team_id', selectedTeam.id);
 
       if (error) throw error;
-      setTeamMembers(data || []);
+      
+      // Type cast the role field to ensure it matches our interface
+      const typedMembers: TeamMember[] = (data || []).map(member => ({
+        ...member,
+        role: member.role as 'admin' | 'editor' | 'viewer'
+      }));
+      
+      setTeamMembers(typedMembers);
     } catch (error: any) {
       toast({
         title: "Error loading team members",

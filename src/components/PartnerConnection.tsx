@@ -38,7 +38,14 @@ const PartnerConnection = ({ userPlan }: PartnerConnectionProps) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPartners(data || []);
+      
+      // Type cast the status field to ensure it matches our interface
+      const typedPartners: Partner[] = (data || []).map(partner => ({
+        ...partner,
+        status: partner.status as 'pending' | 'accepted' | 'declined'
+      }));
+      
+      setPartners(typedPartners);
     } catch (error: any) {
       toast({
         title: "Error loading partners",
