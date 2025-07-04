@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      calendar_tasks: {
+        Row: {
+          category: string
+          completed: boolean
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          time: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          completed?: boolean
+          created_at?: string
+          date: string
+          description?: string | null
+          id?: string
+          time?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          completed?: boolean
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          time?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           color: string | null
@@ -33,6 +69,33 @@ export type Database = {
         }
         Relationships: []
       }
+      partners: {
+        Row: {
+          created_at: string
+          id: string
+          partner_email: string
+          partner_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          partner_email: string
+          partner_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          partner_email?: string
+          partner_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -41,6 +104,7 @@ export type Database = {
           last_completed_date: string | null
           name: string
           notifications_enabled: boolean
+          plan: string | null
           theme_preference: string | null
         }
         Insert: {
@@ -50,6 +114,7 @@ export type Database = {
           last_completed_date?: string | null
           name: string
           notifications_enabled?: boolean
+          plan?: string | null
           theme_preference?: string | null
         }
         Update: {
@@ -59,6 +124,7 @@ export type Database = {
           last_completed_date?: string | null
           name?: string
           notifications_enabled?: boolean
+          plan?: string | null
           theme_preference?: string | null
         }
         Relationships: []
@@ -87,6 +153,168 @@ export type Database = {
           completed?: boolean
           created_at?: string
           day?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: string
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_tasks: {
+        Row: {
+          assigned_to: string | null
+          category: string
+          completed: boolean
+          created_at: string
+          day: string
+          id: string
+          name: string
+          team_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category: string
+          completed?: boolean
+          created_at?: string
+          day: string
+          id?: string
+          name: string
+          team_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string
+          completed?: boolean
+          created_at?: string
+          day?: string
+          id?: string
+          name?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_tasks_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
+      workspace_tasks: {
+        Row: {
+          category: string
+          completed: boolean
+          created_at: string
+          day: string
+          id: string
+          name: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          category: string
+          completed?: boolean
+          created_at?: string
+          day: string
+          id?: string
+          name: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          category?: string
+          completed?: boolean
+          created_at?: string
+          day?: string
+          id?: string
+          name?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_tasks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspaces: {
+        Row: {
+          color: string | null
+          created_at: string
+          emoji: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          emoji?: string | null
           id?: string
           name?: string
           user_id?: string

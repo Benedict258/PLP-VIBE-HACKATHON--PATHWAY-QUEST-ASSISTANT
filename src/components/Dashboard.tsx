@@ -9,9 +9,14 @@ import TaskForm from './TaskForm';
 import ScheduleBoard from './ScheduleBoard';
 import ProgressSummary from './ProgressSummary';
 import NotificationPanel from './NotificationPanel';
-import SettingsPanel from './SettingsPanel';
+import EnhancedSettingsPanel from './EnhancedSettingsPanel';
 import StreakCounter from './StreakCounter';
 import PWAInstallPrompt from './PWAInstallPrompt';
+import PlanSelection from './PlanSelection';
+import WorkspaceSelector from './WorkspaceSelector';
+import PartnerConnection from './PartnerConnection';
+import CalendarView from './CalendarView';
+import TeamDashboard from './TeamDashboard';
 
 interface Task {
   id: string;
@@ -26,6 +31,14 @@ interface Profile {
   id: string;
   name: string;
   current_streak: number;
+  plan: string;
+}
+
+interface Workspace {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string;
 }
 
 interface DashboardProps {
@@ -35,9 +48,12 @@ interface DashboardProps {
 const Dashboard = ({ onLogout }: DashboardProps) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showPlanSelection, setShowPlanSelection] = useState(false);
+  const [activeTab, setActiveTab] = useState<'tasks' | 'calendar' | 'teams' | 'partners'>('tasks');
   const { toast } = useToast();
   const { sendNotification } = useNotifications();
 
@@ -65,6 +81,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
       if (error) throw error;
       setProfile(data);
+      
+      // Check if user needs to select a plan
+      if (!data.plan || data.plan === null) {
+        setShowPlanSelection(true);
+      }
     } catch (error: any) {
       console.error('Error fetching profile:', error);
     }
@@ -82,7 +103,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       
       // Check for pending tasks and send notifications
       const pendingTasks = data?.filter(task => !task.completed) || [];
-      if (pendingTasks.length > 0) {
+      if (pendingTasks.length > 0 && profile?.plan !== 'free') {
         const nextTask = pendingTasks[0];
         sendNotification(
           'Task Reminder',
@@ -132,6 +153,15 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     }
   };
 
+  const handlePlanSelected = (plan: string) => {
+    setShowPlanSelection(false);
+    fetchProfile(); // Refresh to get updated plan
+    toast({
+      title: "Welcome!",
+      description: "Your productivity journey starts now. Let's achieve your goals together!",
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
@@ -141,6 +171,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         </div>
       </div>
     );
+  }
+
+  if (showPlanSelection) {
+    return <PlanSelection onPlanSelected={handlePlanSelected} />;
   }
 
   return (
@@ -161,6 +195,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                   {profile && (
                     <p className="text-sm text-purple-600 dark:text-purple-300">
                       Welcome back, {profile.name}! 👋
+                      <span className="ml-2 bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full text-xs font-medium capitalize">
+                        {profile.plan}
+                      </span>
                     </p>
                   )}
                 </div>
@@ -198,37 +235,101 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Left Column - Main Content */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* Streak Counter */}
-            {profile && (
-              <StreakCounter streak={profile.current_streak} />
-            )}
-            
-            {/* Schedule Board */}
-            <ScheduleBoard tasks={tasks} onTasksChange={handleTaskComplete} />
-            
-            {/* Notifications Panel */}
-            <NotificationPanel tasks={tasks} />
-          </div>
-
-          {/* Right Column - Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Task Form */}
-            <TaskForm onTaskAdded={fetchTasks} />
-            
-            {/* Progress Summary */}
-            <ProgressSummary tasks={tasks} />
-          </div>
+      {/* Navigation Tabs */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Button
+            onClick={() => setActiveTab('tasks')}
+            variant={activeTab === 'tasks' ? 'default' : 'outline'}
+            className={activeTab === 'tasks' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+          >
+            Tasks & Progress
+          </Button>
+          {profile?.plan === 'premium' && (
+            <>
+              <Button
+                onClick={() => setActiveTab('calendar')}
+                variant={activeTab === 'calendar' ? 'default' : 'outline'}
+                className={activeTab === 'calendar' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+              >
+                Calendar
+              </Button>
+              <Button
+                onClick={() => setActiveTab('teams')}
+                variant={activeTab === 'teams' ? 'default' : 'outline'}
+                className={activeTab === 'teams' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+              >
+                Teams
+              </Button>
+              <Button
+                onClick={() => setActiveTab('partners')}
+                variant={activeTab === 'partners' ? 'default' : 'outline'}
+                className={activeTab === 'partners' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+              >
+                Partners
+              </Button>
+            </>
+          )}
         </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        {activeTab === 'tasks' && (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-3 space-y-8">
+              {/* Workspace Selector */}
+              {profile && (
+                <WorkspaceSelector
+                  currentWorkspace={currentWorkspace}
+                  onWorkspaceChange={setCurrentWorkspace}
+                  userPlan={profile.plan}
+                />
+              )}
+
+              {/* Streak Counter */}
+              {profile && profile.plan !== 'free' && (
+                <StreakCounter streak={profile.current_streak} />
+              )}
+              
+              {/* Schedule Board */}
+              <ScheduleBoard tasks={tasks} onTasksChange={handleTaskComplete} />
+              
+              {/* Notifications Panel */}
+              <NotificationPanel tasks={tasks} />
+            </div>
+
+            {/* Right Column - Sidebar */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* Task Form */}
+              <TaskForm onTaskAdded={fetchTasks} />
+              
+              {/* Progress Summary */}
+              <ProgressSummary tasks={tasks} />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'calendar' && profile && (
+          <CalendarView userPlan={profile.plan} />
+        )}
+
+        {activeTab === 'teams' && profile && (
+          <TeamDashboard userPlan={profile.plan} />
+        )}
+
+        {activeTab === 'partners' && profile && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <PartnerConnection userPlan={profile.plan} />
+            {/* Add partner progress sharing component here in the future */}
+          </div>
+        )}
       </main>
 
       {/* Settings Panel */}
       {showSettings && (
-        <SettingsPanel onClose={() => setShowSettings(false)} />
+        <EnhancedSettingsPanel onClose={() => setShowSettings(false)} />
       )}
 
       {/* PWA Install Prompt */}
