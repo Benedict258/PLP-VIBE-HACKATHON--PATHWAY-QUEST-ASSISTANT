@@ -83,3 +83,11 @@
     "vite": "^5.4.1"
   }
 }
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "build:dev": "vite build --mode development",
+  "lint": "eslint .",
+  "preview": "vite preview",
+  "start": "vite preview"
+}
