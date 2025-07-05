@@ -1,8 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell, Check, X, Settings, Users, MessageCircle } from 'lucide-react';
+
+interface Task {
+  id: string;
+  name: string;
+  category: string;
+  completed: boolean;
+  day: string;
+}
 
 interface Notification {
   id: string;
@@ -17,9 +24,10 @@ interface Notification {
 interface NotificationPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  tasks?: Task[];
 }
 
-const NotificationPanel = ({ isOpen, onClose }: NotificationPanelProps) => {
+const NotificationPanel = ({ isOpen, onClose, tasks = [] }: NotificationPanelProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -14,16 +13,6 @@ interface Team {
   created_at: string;
 }
 
-interface TeamMember {
-  id: string;
-  user_id: string;
-  role: 'admin' | 'editor' | 'viewer';
-  profiles?: {
-    name: string;
-    first_name: string;
-  };
-}
-
 interface TeamTask {
   id: string;
   name: string;
@@ -32,6 +21,16 @@ interface TeamTask {
   assigned_to: string | null;
   day: string;
   team_id: string;
+}
+
+interface TeamMember {
+  id: string;
+  user_id: string;
+  role: 'admin' | 'editor' | 'viewer';
+  profiles?: {
+    name: string;
+    first_name: string;
+  };
 }
 
 interface TeamDashboardProps {
@@ -90,16 +89,28 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
     if (!selectedTeam) return;
 
     try {
+      // Try to fetch with profiles relation first
       const { data, error } = await supabase
         .from('team_members')
         .select(`
           *,
-          profiles:user_id (name, first_name)
+          profiles!team_members_user_id_fkey (name, first_name)
         `)
         .eq('team_id', selectedTeam.id);
 
-      if (error) throw error;
-      setTeamMembers(data || []);
+      if (error) {
+        console.log('Error fetching team members with profiles:', error);
+        // Fallback to basic team member data
+        const { data: basicData, error: basicError } = await supabase
+          .from('team_members')
+          .select('*')
+          .eq('team_id', selectedTeam.id);
+        
+        if (basicError) throw basicError;
+        setTeamMembers(basicData || []);
+      } else {
+        setTeamMembers(data || []);
+      }
     } catch (error: any) {
       toast({
         title: "Error loading team members",
@@ -182,11 +193,11 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
 
     setLoading(true);
     try {
-      // Check if user exists
+      // Check if user exists by email/name in profiles
       const { data: profiles, error: profileError } = await supabase
         .from('profiles')
-        .select('id')
-        .ilike('name', `%${newMemberEmail}%`);
+        .select('id, name')
+        .or(`name.ilike.%${newMemberEmail}%`);
 
       if (profileError) throw profileError;
 

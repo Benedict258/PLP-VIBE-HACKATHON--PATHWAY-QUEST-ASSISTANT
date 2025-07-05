@@ -1,3 +1,4 @@
+
 import React from 'react';
 import './App.css';
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -10,14 +11,18 @@ import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Toaster />
-      <PWAInstallPrompt />
-    </BrowserRouter>
+    <ThemeProvider>
+      <NotificationsProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+          <PWAInstallPrompt />
+        </BrowserRouter>
+      </NotificationsProvider>
+    </ThemeProvider>
   );
 }
 

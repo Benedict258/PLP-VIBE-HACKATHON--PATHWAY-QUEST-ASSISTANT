@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -8,12 +7,12 @@ import { Crown, Check, Zap, Users, MessageCircle, Palette, Bell } from 'lucide-r
 
 interface PlanSelectionProps {
   currentPlan: string;
-  onPlanChange?: (newPlan: string) => void;
+  onPlanSelected?: (newPlan: string) => void;
   showModal?: boolean;
   onClose?: () => void;
 }
 
-const PlanSelection = ({ currentPlan, onPlanChange, showModal = false, onClose }: PlanSelectionProps) => {
+const PlanSelection = ({ currentPlan, onPlanSelected, showModal = false, onClose }: PlanSelectionProps) => {
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(currentPlan);
   const { toast } = useToast();
@@ -90,7 +89,7 @@ const PlanSelection = ({ currentPlan, onPlanChange, showModal = false, onClose }
       if (error) throw error;
 
       setSelectedPlan(planId);
-      onPlanChange?.(planId);
+      onPlanSelected?.(planId);
       
       toast({
         title: "Plan updated",

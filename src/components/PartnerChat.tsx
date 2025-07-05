@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { MessageCircle, Send, Plus, CheckSquare, Users, Mail } from 'lucide-reac
 interface Partner {
   id: string;
   user_id: string;
-  partner_id: string;
+  partner_id: string | null;
   partner_email: string;
   status: string;
   chat_room_id: string | null;
@@ -108,17 +107,31 @@ const PartnerChat = () => {
 
   const fetchPartners = async () => {
     try {
+      // First get partners where we have valid partner_id
       const { data, error } = await supabase
         .from('partners')
         .select(`
           *,
-          profiles:partner_id (name, first_name)
+          profiles!partners_partner_id_fkey (name, first_name)
         `)
         .eq('status', 'accepted')
+        .not('partner_id', 'is', null)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setPartners(data || []);
+      if (error) {
+        console.log('Error fetching partners with profiles:', error);
+        // Fallback to basic partner data without profiles
+        const { data: basicData, error: basicError } = await supabase
+          .from('partners')
+          .select('*')
+          .eq('status', 'accepted')
+          .order('created_at', { ascending: false });
+        
+        if (basicError) throw basicError;
+        setPartners(basicData || []);
+      } else {
+        setPartners(data || []);
+      }
       
       if (data && data.length > 0 && !selectedPartner) {
         setSelectedPartner(data[0]);
@@ -182,6 +195,19 @@ const PartnerChat = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Check if user exists by email in profiles
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, name')
+        .ilike('name', `%${newPartnerEmail}%`);
+
+      if (profileError) throw profileError;
+
+      let partnerId = null;
+      if (profiles && profiles.length > 0) {
+        partnerId = profiles[0].id;
+      }
+
       // Create chat room first
       const { data: chatRoom, error: chatError } = await supabase
         .from('chat_rooms')
@@ -196,6 +222,7 @@ const PartnerChat = () => {
         .from('partners')
         .insert({
           user_id: user.id,
+          partner_id: partnerId,
           partner_email: newPartnerEmail.trim(),
           status: 'accepted', // For demo, auto-accept
           chat_room_id: chatRoom.id

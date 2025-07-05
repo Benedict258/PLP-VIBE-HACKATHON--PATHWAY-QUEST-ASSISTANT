@@ -1,8 +1,18 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useNotifications = () => {
+interface NotificationsContextType {
+  notificationsEnabled: boolean;
+  permission: NotificationPermission;
+  toggleNotifications: (enabled: boolean) => Promise<boolean>;
+  sendNotification: (title: string, body: string, options?: NotificationOptions) => void;
+  requestNotificationPermission: () => Promise<boolean>;
+}
+
+const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
+
+export const NotificationsProvider = ({ children }: { children: ReactNode }) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>('default');
 
@@ -66,11 +76,25 @@ export const useNotifications = () => {
     }
   };
 
-  return {
+  const value = {
     notificationsEnabled,
     permission,
     toggleNotifications,
     sendNotification,
     requestNotificationPermission
   };
+
+  return (
+    <NotificationsContext.Provider value={value}>
+      {children}
+    </NotificationsContext.Provider>
+  );
+};
+
+export const useNotifications = () => {
+  const context = useContext(NotificationsContext);
+  if (context === undefined) {
+    throw new Error('useNotifications must be used within a NotificationsProvider');
+  }
+  return context;
 };
