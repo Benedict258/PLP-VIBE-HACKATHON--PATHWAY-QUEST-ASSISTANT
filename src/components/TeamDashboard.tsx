@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -30,7 +31,7 @@ interface TeamMember {
   profiles?: {
     name: string;
     first_name: string;
-  };
+  } | null;
 }
 
 interface TeamDashboardProps {
@@ -107,9 +108,24 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
           .eq('team_id', selectedTeam.id);
         
         if (basicError) throw basicError;
-        setTeamMembers(basicData || []);
+        
+        // Transform data to match TeamMember interface
+        const transformedData: TeamMember[] = (basicData || []).map(member => ({
+          ...member,
+          role: member.role as 'admin' | 'editor' | 'viewer',
+          profiles: null
+        }));
+        
+        setTeamMembers(transformedData);
       } else {
-        setTeamMembers(data || []);
+        // Transform data to match TeamMember interface
+        const transformedData: TeamMember[] = (data || []).map(member => ({
+          ...member,
+          role: member.role as 'admin' | 'editor' | 'viewer',
+          profiles: member.profiles || null
+        }));
+        
+        setTeamMembers(transformedData);
       }
     } catch (error: any) {
       toast({
@@ -293,6 +309,10 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  const getMemberDisplayName = (member: TeamMember) => {
+    return member.profiles?.name || 'Unknown User';
   };
 
   if (userPlan !== 'premium') {
@@ -493,10 +513,10 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-sm font-medium text-purple-600">
-                          {getInitials(member.profiles?.name || 'U')}
+                          {getInitials(getMemberDisplayName(member))}
                         </div>
                         <div>
-                          <p className="font-medium text-sm">{member.profiles?.name || 'Unknown User'}</p>
+                          <p className="font-medium text-sm">{getMemberDisplayName(member)}</p>
                           <div className="flex items-center gap-1 text-xs">
                             {member.role === 'admin' && (
                               <>

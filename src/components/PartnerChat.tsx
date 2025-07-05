@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ interface Partner {
   profiles?: {
     name: string;
     first_name: string;
-  };
+  } | null;
 }
 
 interface Message {
@@ -107,7 +108,7 @@ const PartnerChat = () => {
 
   const fetchPartners = async () => {
     try {
-      // First get partners where we have valid partner_id
+      // First try to get partners with profiles relation
       const { data, error } = await supabase
         .from('partners')
         .select(`
@@ -128,13 +129,30 @@ const PartnerChat = () => {
           .order('created_at', { ascending: false });
         
         if (basicError) throw basicError;
-        setPartners(basicData || []);
+        
+        // Transform data to match Partner interface
+        const transformedData: Partner[] = (basicData || []).map(partner => ({
+          ...partner,
+          profiles: null
+        }));
+        
+        setPartners(transformedData);
       } else {
-        setPartners(data || []);
+        // Transform data to match Partner interface
+        const transformedData: Partner[] = (data || []).map(partner => ({
+          ...partner,
+          profiles: partner.profiles || null
+        }));
+        
+        setPartners(transformedData);
       }
       
       if (data && data.length > 0 && !selectedPartner) {
-        setSelectedPartner(data[0]);
+        const transformedPartner: Partner = {
+          ...data[0],
+          profiles: data[0].profiles || null
+        };
+        setSelectedPartner(transformedPartner);
       }
     } catch (error: any) {
       toast({
@@ -333,6 +351,10 @@ const PartnerChat = () => {
     });
   };
 
+  const getPartnerDisplayName = (partner: Partner) => {
+    return partner.profiles?.name || partner.partner_email;
+  };
+
   return (
     <div className="flex flex-col h-full max-h-[calc(100vh-200px)]">
       {/* Add Partner */}
@@ -391,11 +413,11 @@ const PartnerChat = () => {
                   } border`}
                 >
                   <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-sm font-medium text-purple-600">
-                    {getInitials(partner.profiles?.name || partner.partner_email)}
+                    {getInitials(getPartnerDisplayName(partner))}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm truncate">
-                      {partner.profiles?.name || partner.partner_email}
+                      {getPartnerDisplayName(partner)}
                     </p>
                     <p className="text-xs text-gray-500">Active</p>
                   </div>
@@ -473,7 +495,7 @@ const PartnerChat = () => {
                 <CardHeader className="pb-3 flex-shrink-0">
                   <CardTitle className="flex items-center gap-2 text-purple-700 text-lg">
                     <MessageCircle className="w-5 h-5" />
-                    Chat with {selectedPartner.profiles?.name || selectedPartner.partner_email}
+                    Chat with {getPartnerDisplayName(selectedPartner)}
                   </CardTitle>
                 </CardHeader>
                 

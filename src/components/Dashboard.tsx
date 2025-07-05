@@ -53,6 +53,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   const [user, setUser] = useState<any>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showPlanSelection, setShowPlanSelection] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [activeTab, setActiveTab] = useState<'tasks' | 'calendar' | 'teams' | 'partners'>('tasks');
   const { toast } = useToast();
   const { sendNotification } = useNotifications();
@@ -174,7 +175,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   }
 
   if (showPlanSelection) {
-    return <PlanSelection onPlanSelected={handlePlanSelected} />;
+    return <PlanSelection currentPlan="free" onPlanSelected={handlePlanSelected} />;
   }
 
   return (
@@ -297,7 +298,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <ScheduleBoard tasks={tasks} onTasksChange={handleTaskComplete} />
               
               {/* Notifications Panel */}
-              <NotificationPanel tasks={tasks} />
+              <NotificationPanel 
+                tasks={tasks} 
+                isOpen={showNotifications}
+                onClose={() => setShowNotifications(false)}
+              />
             </div>
 
             {/* Right Column - Sidebar */}
