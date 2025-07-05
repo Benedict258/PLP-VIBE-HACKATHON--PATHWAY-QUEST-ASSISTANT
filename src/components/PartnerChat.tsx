@@ -108,12 +108,12 @@ const PartnerChat = () => {
 
   const fetchPartners = async () => {
     try {
-      // First try to get partners with profiles relation
+      // Try to get partners with profiles relation
       const { data, error } = await supabase
         .from('partners')
         .select(`
           *,
-          profiles!partners_partner_id_fkey (name, first_name)
+          profiles!fk_partner_profile (name, first_name)
         `)
         .eq('status', 'accepted')
         .not('partner_id', 'is', null)
@@ -130,29 +130,13 @@ const PartnerChat = () => {
         
         if (basicError) throw basicError;
         
-        // Transform data to match Partner interface
-        const transformedData: Partner[] = (basicData || []).map(partner => ({
-          ...partner,
-          profiles: null
-        }));
-        
-        setPartners(transformedData);
+        setPartners(basicData || []);
       } else {
-        // Transform data to match Partner interface
-        const transformedData: Partner[] = (data || []).map(partner => ({
-          ...partner,
-          profiles: partner.profiles || null
-        }));
-        
-        setPartners(transformedData);
+        setPartners(data || []);
       }
       
       if (data && data.length > 0 && !selectedPartner) {
-        const transformedPartner: Partner = {
-          ...data[0],
-          profiles: data[0].profiles || null
-        };
-        setSelectedPartner(transformedPartner);
+        setSelectedPartner(data[0]);
       }
     } catch (error: any) {
       toast({

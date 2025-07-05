@@ -95,7 +95,7 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
         .from('team_members')
         .select(`
           *,
-          profiles!team_members_user_id_fkey (name, first_name)
+          profiles!fk_team_member_profile (name, first_name)
         `)
         .eq('team_id', selectedTeam.id);
 

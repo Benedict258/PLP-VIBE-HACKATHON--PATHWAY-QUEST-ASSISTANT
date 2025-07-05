@@ -184,6 +184,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_partner_profile"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "partners_chat_room_id_fkey"
             columns: ["chat_room_id"]
             isOneToOne: false
@@ -287,6 +294,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_team_member_profile"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "team_members_team_id_fkey"
             columns: ["team_id"]
