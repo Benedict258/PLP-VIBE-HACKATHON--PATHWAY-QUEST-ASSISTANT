@@ -1,8 +1,8 @@
 
 {
-  "name": "Pathway Quest - Weekly Productivity Dashboard",
+  "name": "Pathway Quest - Productivity Dashboard",
   "short_name": "Pathway Quest",
-  "description": "A modern weekly productivity dashboard to organize, manage, and track your tasks across the week",
+  "description": "Your productivity assistant for success. Track tasks, build streaks, and collaborate with teams.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#8B5CF6",
@@ -10,28 +10,28 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any maskable"
     }
   ],
-  "categories": ["productivity", "lifestyle", "utilities"],
+  "categories": ["productivity", "business", "lifestyle"],
+  "screenshots": [],
   "shortcuts": [
     {
       "name": "Add Task",
       "short_name": "Add Task",
-      "description": "Quickly add a new task",
       "url": "/?action=add-task",
       "icons": [
         {
-          "src": "/icon-192.png",
+          "src": "icon-192.png",
           "sizes": "192x192"
         }
       ]

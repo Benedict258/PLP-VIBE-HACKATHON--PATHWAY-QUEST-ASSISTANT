@@ -1,145 +1,217 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bell, Star, CheckCircle } from 'lucide-react';
+import { Bell, Check, X, Settings, Users, MessageCircle } from 'lucide-react';
 
-interface Task {
+interface Notification {
   id: string;
-  name: string;
-  category: string;
-  day: string;
-  completed: boolean;
-  created_at: string;
+  type: 'task' | 'team' | 'partner' | 'system';
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+  actionUrl?: string;
 }
 
 interface NotificationPanelProps {
-  tasks: Task[];
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-const NotificationPanel = ({ tasks }: NotificationPanelProps) => {
-  const getNextPendingTask = () => {
-    const pendingTasks = tasks.filter(task => !task.completed);
-    if (pendingTasks.length === 0) return null;
+const NotificationPanel = ({ isOpen, onClose }: NotificationPanelProps) => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    // Mock notifications for demo
+    const mockNotifications: Notification[] = [
+      {
+        id: '1',
+        type: 'team',
+        title: 'New team invitation',
+        message: 'You have been invited to join "Marketing Team"',
+        timestamp: new Date(Date.now() - 10 * 60 * 1000), // 10 minutes ago
+        read: false
+      },
+      {
+        id: '2',
+        type: 'partner',
+        title: 'Study partner message',
+        message: 'John sent you a message about tomorrow\'s study session',
+        timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+        read: false
+      },
+      {
+        id: '3',
+        type: 'task',
+        title: 'Task reminder',
+        message: 'You have 3 tasks due today',
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        read: true
+      },
+      {
+        id: '4',
+        type: 'system',
+        title: 'Streak milestone!',
+        message: 'Congratulations! You\'ve reached a 7-day streak',
+        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+        read: true
+      }
+    ];
     
-    // Sort by creation date to get the oldest pending task
-    return pendingTasks.sort((a, b) => 
-      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    )[0];
+    setNotifications(mockNotifications);
+  }, []);
+
+  const markAsRead = (notificationId: string) => {
+    setNotifications(prev =>
+      prev.map(notif =>
+        notif.id === notificationId ? { ...notif, read: true } : notif
+      )
+    );
   };
 
-  const getRecentCompletions = () => {
-    return tasks
-      .filter(task => task.completed)
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .slice(0, 5);
+  const markAllAsRead = () => {
+    setNotifications(prev =>
+      prev.map(notif => ({ ...notif, read: true }))
+    );
   };
 
-  const nextTask = getNextPendingTask();
-  const recentCompletions = getRecentCompletions();
-
-  const getCategoryColor = (category: string) => {
-    const colors = {
-      'Programming': 'text-blue-600 bg-blue-50',
-      'Mechatronics & Tech': 'text-green-600 bg-green-50',
-      'Schoolwork': 'text-orange-600 bg-orange-50',
-      'Business Learning': 'text-pink-600 bg-pink-50',
-    };
-    return colors[category as keyof typeof colors] || 'text-gray-600 bg-gray-50';
+  const deleteNotification = (notificationId: string) => {
+    setNotifications(prev =>
+      prev.filter(notif => notif.id !== notificationId)
+    );
   };
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'team':
+        return <Users className="w-4 h-4 text-blue-500" />;
+      case 'partner':
+        return <MessageCircle className="w-4 h-4 text-green-500" />;
+      case 'task':
+        return <Bell className="w-4 h-4 text-orange-500" />;
+      case 'system':
+        return <Settings className="w-4 h-4 text-purple-500" />;
+      default:
+        return <Bell className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
+  const formatTimestamp = (timestamp: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - timestamp.getTime();
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (minutes < 60) {
+      return `${minutes}m ago`;
+    } else if (hours < 24) {
+      return `${hours}h ago`;
+    } else {
+      return `${days}d ago`;
+    }
+  };
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  if (!isOpen) return null;
 
   return (
-    <Card className="shadow-lg border-purple-200 bg-white/50 backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle className="text-xl text-purple-800 flex items-center gap-2">
-          <Bell className="w-5 h-5" />
-          Notifications
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Next Pending Task */}
-        <div className="space-y-3">
-          <h4 className="font-semibold text-purple-700 flex items-center gap-2">
-            <Star className="w-4 h-4 text-amber-500" />
-            Next Up
-          </h4>
-          {nextTask ? (
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-amber-100 rounded-full p-2">
-                  <Star className="w-4 h-4 text-amber-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-800 mb-1">
-                    {nextTask.name}
-                  </p>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(nextTask.category)}`}>
-                      {nextTask.category}
-                    </span>
-                    <span className="text-gray-500">•</span>
-                    <span className="text-gray-600">{nextTask.day}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-              <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
-              <p className="text-green-800 font-medium">All caught up! 🎉</p>
-              <p className="text-green-600 text-sm">No pending tasks</p>
-            </div>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-4 sm:pt-16">
+      <Card className="w-full max-w-md mx-4 max-h-[80vh] bg-white shadow-2xl">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Bell className="w-5 h-5 text-purple-600" />
+              Notifications
+              {unreadCount > 0 && (
+                <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                  {unreadCount}
+                </span>
+              )}
+            </CardTitle>
+            <Button onClick={onClose} variant="ghost" size="sm">
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          {unreadCount > 0 && (
+            <Button
+              onClick={markAllAsRead}
+              variant="ghost"
+              size="sm"
+              className="self-start text-purple-600 hover:text-purple-700"
+            >
+              Mark all as read
+            </Button>
           )}
-        </div>
-
-        {/* Recent Completions */}
-        <div className="space-y-3">
-          <h4 className="font-semibold text-purple-700 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            Recent Completions
-          </h4>
-          <div className="space-y-2">
-            {recentCompletions.length === 0 ? (
-              <p className="text-gray-500 text-sm text-center py-4">
-                No completed tasks yet
-              </p>
+        </CardHeader>
+        
+        <CardContent className="p-0">
+          <div className="max-h-96 overflow-y-auto">
+            {notifications.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p>No notifications yet</p>
+              </div>
             ) : (
-              recentCompletions.map((task, index) => (
-                <div
-                  key={task.id}
-                  className="bg-green-50 border border-green-100 rounded-lg p-3 transition-all hover:shadow-sm"
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                    <p className="text-sm font-medium text-gray-800 truncate">
-                      Congrats! You completed "{task.name}"
-                    </p>
+              <div className="space-y-1">
+                {notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                      !notification.read ? 'bg-purple-50 border-l-4 border-l-purple-500' : ''
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-1">
+                        {getNotificationIcon(notification.type)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <p className="font-medium text-sm text-gray-900">
+                              {notification.title}
+                            </p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {formatTimestamp(notification.timestamp)}
+                            </p>
+                          </div>
+                          <div className="flex gap-1 flex-shrink-0">
+                            {!notification.read && (
+                              <Button
+                                onClick={() => markAsRead(notification.id)}
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                              >
+                                <Check className="w-3 h-3" />
+                              </Button>
+                            )}
+                            <Button
+                              onClick={() => deleteNotification(notification.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 ml-6">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(task.category)}`}>
-                      {task.category}
-                    </span>
-                    <span className="text-gray-400 text-xs">•</span>
-                    <span className="text-gray-500 text-xs">{task.day}</span>
-                  </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
-        </div>
-
-        {/* Motivational Message */}
-        {tasks.length > 0 && (
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-100 rounded-lg p-4">
-            <p className="text-purple-800 font-medium text-center">
-              {tasks.filter(t => t.completed).length === tasks.length
-                ? "Perfect week! You're crushing it! 🚀"
-                : `Keep going! ${tasks.filter(t => !t.completed).length} tasks to go 💪`
-              }
-            </p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

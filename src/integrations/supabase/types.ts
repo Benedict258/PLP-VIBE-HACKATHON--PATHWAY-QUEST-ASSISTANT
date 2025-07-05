@@ -69,8 +69,94 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_rooms: {
+        Row: {
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          chat_room_id: string
+          content: string
+          created_at: string
+          id: string
+          sender_id: string
+        }
+        Insert: {
+          chat_room_id: string
+          content: string
+          created_at?: string
+          id?: string
+          sender_id: string
+        }
+        Update: {
+          chat_room_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_chat_room_id_fkey"
+            columns: ["chat_room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_tasks: {
+        Row: {
+          chat_room_id: string
+          completed: boolean
+          created_at: string
+          created_by: string
+          id: string
+          title: string
+        }
+        Insert: {
+          chat_room_id: string
+          completed?: boolean
+          created_at?: string
+          created_by: string
+          id?: string
+          title: string
+        }
+        Update: {
+          chat_room_id?: string
+          completed?: boolean
+          created_at?: string
+          created_by?: string
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_tasks_chat_room_id_fkey"
+            columns: ["chat_room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partners: {
         Row: {
+          chat_room_id: string | null
           created_at: string
           id: string
           partner_email: string
@@ -79,6 +165,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          chat_room_id?: string | null
           created_at?: string
           id?: string
           partner_email: string
@@ -87,6 +174,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          chat_room_id?: string | null
           created_at?: string
           id?: string
           partner_email?: string
@@ -94,34 +182,51 @@ export type Database = {
           status?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "partners_chat_room_id_fkey"
+            columns: ["chat_room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           current_streak: number
+          first_name: string | null
           id: string
           last_completed_date: string | null
+          last_name: string | null
           name: string
           notifications_enabled: boolean
           plan: string | null
           theme_preference: string | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           current_streak?: number
+          first_name?: string | null
           id: string
           last_completed_date?: string | null
+          last_name?: string | null
           name: string
           notifications_enabled?: boolean
           plan?: string | null
           theme_preference?: string | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           current_streak?: number
+          first_name?: string | null
           id?: string
           last_completed_date?: string | null
+          last_name?: string | null
           name?: string
           notifications_enabled?: boolean
           plan?: string | null
@@ -326,6 +431,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      is_team_owner: {
+        Args: { team_uuid: string }
+        Returns: boolean
+      }
       update_user_streak: {
         Args: { user_uuid: string }
         Returns: undefined

@@ -1,90 +1,108 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Check, Crown, Zap, Users, Calendar, Palette, Bell, Download } from 'lucide-react';
+import { Crown, Check, Zap, Users, MessageCircle, Palette, Bell } from 'lucide-react';
 
 interface PlanSelectionProps {
-  onPlanSelected: (plan: string) => void;
+  currentPlan: string;
+  onPlanChange?: (newPlan: string) => void;
+  showModal?: boolean;
+  onClose?: () => void;
 }
 
-const PlanSelection = ({ onPlanSelected }: PlanSelectionProps) => {
-  const [selectedPlan, setSelectedPlan] = useState<string>('free');
+const PlanSelection = ({ currentPlan, onPlanChange, showModal = false, onClose }: PlanSelectionProps) => {
   const [loading, setLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(currentPlan);
   const { toast } = useToast();
 
   const plans = [
     {
       id: 'free',
-      name: 'Free',
+      name: 'Basic',
       price: 'Free',
-      icon: Check,
+      description: 'Perfect for personal productivity',
       features: [
-        'Personal task management',
-        'Weekly progress tracking',
+        'Personal task tracking',
         'Basic categories',
-        'Task completion streaks'
+        'Streak counter',
+        'Calendar view',
+        'Up to 3 workspaces'
       ],
-      color: 'border-gray-200 bg-white'
+      icon: Zap,
+      color: 'text-gray-600',
+      bgColor: 'bg-gray-50',
+      borderColor: 'border-gray-200'
     },
     {
       id: 'standard',
       name: 'Standard',
-      price: '$15/month',
-      icon: Crown,
+      price: '$15/mo',
+      description: 'Enhanced productivity features',
       features: [
-        'Everything in Free',
-        'Dark/Light mode',
+        'Everything in Basic',
         'Push notifications',
-        'Custom categories & themes',
-        'Export data (CSV/PDF)',
-        'Advanced streak tracking'
+        'Dark/Light themes',
+        'Data export',
+        'Priority support',
+        'Up to 5 workspaces'
       ],
-      color: 'border-purple-200 bg-purple-50',
-      popular: true
+      icon: Bell,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200'
     },
     {
       id: 'premium',
       name: 'Premium',
-      price: '$25/month',
-      icon: Zap,
+      price: '$25/mo',
+      description: 'Full collaboration suite',
       features: [
         'Everything in Standard',
         'Team dashboards',
-        'Workspace switching',
-        'Progress partner matching',
-        'Calendar view with scheduling',
-        'PWA installation',
-        'AI productivity suggestions'
+        'Study partners',
+        'Real-time chat',
+        'Advanced analytics',
+        'Unlimited workspaces',
+        'Custom templates'
       ],
-      color: 'border-gold-200 bg-gradient-to-br from-purple-50 to-indigo-50'
+      icon: Crown,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
+      borderColor: 'border-purple-200',
+      popular: true
     }
   ];
 
-  const handleSelectPlan = async () => {
+  const updatePlan = async (planId: string) => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
+      if (!user) return;
 
       const { error } = await supabase
         .from('profiles')
-        .update({ plan: selectedPlan })
+        .update({ plan: planId })
         .eq('id', user.id);
 
       if (error) throw error;
 
+      setSelectedPlan(planId);
+      onPlanChange?.(planId);
+      
       toast({
-        title: "Welcome to Pathway Quest!",
-        description: `You've selected the ${plans.find(p => p.id === selectedPlan)?.name} plan. Let's boost your productivity!`,
+        title: "Plan updated",
+        description: `Successfully switched to ${plans.find(p => p.id === planId)?.name} plan!`,
       });
 
-      onPlanSelected(selectedPlan);
+      if (onClose) {
+        setTimeout(onClose, 1000);
+      }
     } catch (error: any) {
       toast({
-        title: "Error selecting plan",
+        title: "Error updating plan",
         description: error.message,
         variant: "destructive",
       });
@@ -93,81 +111,109 @@ const PlanSelection = ({ onPlanSelected }: PlanSelectionProps) => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 flex items-center justify-center p-4">
-      <div className="max-w-6xl w-full">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl">PQ</span>
+  const PlanCard = ({ plan }: { plan: typeof plans[0] }) => {
+    const IconComponent = plan.icon;
+    const isCurrentPlan = selectedPlan === plan.id;
+    
+    return (
+      <Card className={`relative ${plan.borderColor} ${isCurrentPlan ? plan.bgColor : 'bg-white'} transition-all hover:shadow-lg`}>
+        {plan.popular && (
+          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+            <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+              Most Popular
+            </span>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-            Welcome to Pathway Quest
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Your all-in-one productivity assistant for tasks, teams, and personal growth. 
-            Choose the plan that fits your productivity journey.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {plans.map((plan) => {
-            const IconComponent = plan.icon;
-            return (
-              <Card
-                key={plan.id}
-                className={`relative cursor-pointer transition-all hover:shadow-lg ${
-                  selectedPlan === plan.id 
-                    ? 'ring-2 ring-purple-500 shadow-lg' 
-                    : 'hover:shadow-md'
-                } ${plan.color}`}
-                onClick={() => setSelectedPlan(plan.id)}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-1 rounded-full text-sm font-medium">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <CardHeader className="text-center pb-4">
-                  <div className="w-12 h-12 mx-auto mb-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                    <IconComponent className="w-6 h-6 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {plan.name}
-                  </CardTitle>
-                  <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                    {plan.price}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        <div className="text-center">
+        )}
+        
+        <CardHeader className="text-center pb-4">
+          <div className={`w-12 h-12 mx-auto ${plan.bgColor} rounded-full flex items-center justify-center mb-3`}>
+            <IconComponent className={`w-6 h-6 ${plan.color}`} />
+          </div>
+          <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
+          <div className="text-2xl font-bold text-gray-900 mb-2">{plan.price}</div>
+          <p className="text-sm text-gray-600">{plan.description}</p>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          <ul className="space-y-2">
+            {plan.features.map((feature, index) => (
+              <li key={index} className="flex items-center gap-2 text-sm">
+                <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+          
           <Button
-            onClick={handleSelectPlan}
-            disabled={loading}
-            size="lg"
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
+            onClick={() => updatePlan(plan.id)}
+            disabled={loading || isCurrentPlan}
+            className={`w-full ${
+              isCurrentPlan
+                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                : plan.id === 'premium'
+                ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                : plan.id === 'standard'
+                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                : 'bg-gray-600 hover:bg-gray-700 text-white'
+            }`}
           >
-            {loading ? 'Setting up your account...' : `Start with ${plans.find(p => p.id === selectedPlan)?.name}`}
+            {isCurrentPlan ? 'Current Plan' : `Switch to ${plan.name}`}
           </Button>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
-            No payment required • Start your productivity journey today
-          </p>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  if (showModal) {
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Choose Your Plan</h2>
+                <p className="text-gray-600 mt-1">Select the plan that best fits your productivity needs</p>
+              </div>
+              {onClose && (
+                <Button onClick={onClose} variant="ghost" size="sm">
+                  ✕
+                </Button>
+              )}
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {plans.map((plan) => (
+                <PlanCard key={plan.id} plan={plan} />
+              ))}
+            </div>
+          </div>
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Choose Your Plan</h2>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Select the plan that best fits your productivity needs. Start with Basic and upgrade anytime.
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {plans.map((plan) => (
+          <PlanCard key={plan.id} plan={plan} />
+        ))}
+      </div>
+      
+      <div className="text-center text-sm text-gray-500 max-w-2xl mx-auto">
+        <p>
+          💳 All plans include secure payment processing. Cancel anytime with no hidden fees.
+          Need help choosing? <span className="text-purple-600 cursor-pointer">Contact support</span>.
+        </p>
       </div>
     </div>
   );
