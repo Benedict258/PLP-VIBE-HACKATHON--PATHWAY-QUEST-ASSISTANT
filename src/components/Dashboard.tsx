@@ -59,32 +59,48 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   const { sendNotification } = useNotifications();
 
   useEffect(() => {
+    console.log('Dashboard mounting, initializing...');
     getCurrentUser();
     fetchTasks();
     fetchProfile();
   }, []);
 
   const getCurrentUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current user:', user);
+      setUser(user);
+    } catch (error) {
+      console.error('Error getting current user:', error);
+    }
   };
 
   const fetchProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        console.log('No user found, cannot fetch profile');
+        return;
+      }
 
+      console.log('Fetching profile for user:', user.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Profile fetch error:', error);
+        throw error;
+      }
+      
+      console.log('Profile data:', data);
       setProfile(data);
       
       // Check if user needs to select a plan
-      if (!data.plan || data.plan === null) {
+      if (!data.plan || data.plan === null || data.plan === 'free') {
+        console.log('User needs to select a plan');
         setShowPlanSelection(true);
       }
     } catch (error: any) {
@@ -94,12 +110,18 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
   const fetchTasks = async () => {
     try {
+      console.log('Fetching tasks...');
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Tasks fetch error:', error);
+        throw error;
+      }
+      
+      console.log('Tasks data:', data);
       setTasks(data || []);
       
       // Check for pending tasks and send notifications
@@ -113,6 +135,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         );
       }
     } catch (error: any) {
+      console.error('Error loading tasks:', error);
       toast({
         title: "Error loading tasks",
         description: error.message,
@@ -155,6 +178,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   };
 
   const handlePlanSelected = (plan: string) => {
+    console.log('Plan selected:', plan);
     setShowPlanSelection(false);
     fetchProfile(); // Refresh to get updated plan
     toast({
@@ -162,6 +186,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       description: "Your productivity journey starts now. Let's achieve your goals together!",
     });
   };
+
+  // Add debugging render
+  console.log('Dashboard render state:', { loading, showPlanSelection, profile, user });
 
   if (loading) {
     return (
@@ -175,11 +202,22 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   }
 
   if (showPlanSelection) {
-    return <PlanSelection currentPlan="free" onPlanSelected={handlePlanSelected} />;
+    return (
+      <PlanSelection 
+        currentPlan={profile?.plan || 'free'} 
+        onPlanSelected={handlePlanSelected} 
+      />
+    );
   }
 
+  // Always render something visible - this is critical for preventing blank screens
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
+      {/* Debug indicator - remove this after confirming it works */}
+      <div className="fixed top-0 right-0 bg-green-500 text-white px-2 py-1 text-xs z-50">
+        Dashboard Loaded ✓
+      </div>
+
       {/* Header */}
       <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-purple-200 dark:border-purple-700 shadow-sm sticky top-0 z-40 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -197,7 +235,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                     <p className="text-sm text-purple-600 dark:text-purple-300">
                       Welcome back, {profile.name}! 👋
                       <span className="ml-2 bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full text-xs font-medium capitalize">
-                        {profile.plan}
+                        {profile.plan || 'free'}
                       </span>
                     </p>
                   )}
@@ -285,7 +323,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 <WorkspaceSelector
                   currentWorkspace={currentWorkspace}
                   onWorkspaceChange={setCurrentWorkspace}
-                  userPlan={profile.plan}
+                  userPlan={profile.plan || 'free'}
                 />
               )}
 
@@ -317,16 +355,16 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         )}
 
         {activeTab === 'calendar' && profile && (
-          <CalendarView userPlan={profile.plan} />
+          <CalendarView userPlan={profile.plan || 'free'} />
         )}
 
         {activeTab === 'teams' && profile && (
-          <TeamDashboard userPlan={profile.plan} />
+          <TeamDashboard userPlan={profile.plan || 'free'} />
         )}
 
         {activeTab === 'partners' && profile && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <PartnerConnection userPlan={profile.plan} />
+            <PartnerConnection userPlan={profile.plan || 'free'} />
             {/* Add partner progress sharing component here in the future */}
           </div>
         )}

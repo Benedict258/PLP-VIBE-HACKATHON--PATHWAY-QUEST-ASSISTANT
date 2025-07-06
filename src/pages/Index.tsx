@@ -10,8 +10,11 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('Index component mounting...');
+    
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session:', session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -20,6 +23,7 @@ const Index = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('Auth state changed:', _event, session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -28,12 +32,16 @@ const Index = () => {
   }, []);
 
   const handleAuthSuccess = () => {
+    console.log('Auth success callback triggered');
     // The onAuthStateChange listener will handle setting the user
   };
 
   const handleLogout = () => {
+    console.log('Logout callback triggered');
     setUser(null);
   };
+
+  console.log('Index render state:', { loading, user: user?.email });
 
   if (loading) {
     return (
@@ -49,6 +57,11 @@ const Index = () => {
   return (
     <ThemeProvider>
       <div className="transition-colors duration-300">
+        {/* Debug indicator - remove after confirming it works */}
+        <div className="fixed top-5 left-0 bg-purple-500 text-white px-2 py-1 text-xs z-50">
+          Index: {user ? 'Authenticated' : 'Not Authenticated'} ✓
+        </div>
+        
         {user ? (
           <Dashboard onLogout={handleLogout} />
         ) : (
