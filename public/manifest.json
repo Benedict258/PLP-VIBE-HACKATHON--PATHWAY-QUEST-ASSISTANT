@@ -5,8 +5,8 @@
   "description": "Your productivity assistant for success. Track tasks, build streaks, and collaborate with teams.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#8B5CF6",
-  "theme_color": "#8B5CF6",
+  "background_color": "#ffffff",
+  "theme_color": "#a78bfa",
   "orientation": "portrait-primary",
   "icons": [
     {

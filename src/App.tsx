@@ -16,17 +16,14 @@ function App() {
     <ThemeProvider>
       <NotificationsProvider>
         <BrowserRouter>
-          {/* Debug indicator - remove after confirming it works */}
-          <div className="fixed top-0 left-0 bg-blue-500 text-white px-2 py-1 text-xs z-50">
-            App Loaded ✓
+          <div className="min-h-screen w-full">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster />
+            <PWAInstallPrompt />
           </div>
-          
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Toaster />
-          <PWAInstallPrompt />
         </BrowserRouter>
       </NotificationsProvider>
     </ThemeProvider>

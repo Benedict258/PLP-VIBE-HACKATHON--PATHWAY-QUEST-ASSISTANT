@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, User, Settings, Download } from 'lucide-react';
+import { LogOut, User, Settings, Bell } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import TaskForm from './TaskForm';
 import ScheduleBoard from './ScheduleBoard';
@@ -54,6 +54,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   const [showSettings, setShowSettings] = useState(false);
   const [showPlanSelection, setShowPlanSelection] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
   const [activeTab, setActiveTab] = useState<'tasks' | 'calendar' | 'teams' | 'partners'>('tasks');
   const { toast } = useToast();
   const { sendNotification } = useNotifications();
@@ -63,6 +64,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     getCurrentUser();
     fetchTasks();
     fetchProfile();
+    
+    // Set up push notification intervals (every 6 hours)
+    const notificationInterval = setInterval(() => {
+      checkAndSendReminders();
+    }, 6 * 60 * 60 * 1000); // 6 hours in milliseconds
+
+    return () => clearInterval(notificationInterval);
   }, []);
 
   const getCurrentUser = async () => {
@@ -124,16 +132,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       console.log('Tasks data:', data);
       setTasks(data || []);
       
-      // Check for pending tasks and send notifications
+      // Update notification count
       const pendingTasks = data?.filter(task => !task.completed) || [];
-      if (pendingTasks.length > 0 && profile?.plan !== 'free') {
-        const nextTask = pendingTasks[0];
-        sendNotification(
-          'Task Reminder',
-          `Don't forget: ${nextTask.name} (${nextTask.day})`,
-          { icon: '/icon-192.png' }
-        );
-      }
+      setNotificationCount(pendingTasks.length);
+      
     } catch (error: any) {
       console.error('Error loading tasks:', error);
       toast({
@@ -143,6 +145,17 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkAndSendReminders = () => {
+    const pendingTasks = tasks.filter(task => !task.completed);
+    if (pendingTasks.length > 0 && profile?.plan !== 'free') {
+      sendNotification(
+        'Task Reminder',
+        `You have ${pendingTasks.length} pending tasks to complete`,
+        { icon: '/icon-192.png' }
+      );
     }
   };
 
@@ -192,7 +205,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
+      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
           <p className="text-purple-600 dark:text-purple-300 text-lg">Loading your dashboard...</p>
@@ -212,15 +225,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
   // Always render something visible - this is critical for preventing blank screens
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
-      {/* Debug indicator - remove this after confirming it works */}
-      <div className="fixed top-0 right-0 bg-green-500 text-white px-2 py-1 text-xs z-50">
-        Dashboard Loaded ✓
-      </div>
-
+    <div className="min-h-screen w-full bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
       {/* Header */}
-      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-purple-200 dark:border-purple-700 shadow-sm sticky top-0 z-40 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-purple-200 dark:border-purple-700 shadow-sm sticky top-0 z-40 transition-colors duration-300 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
@@ -228,7 +236,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                   <span className="text-white font-bold text-lg">PQ</span>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                  <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                     Pathway Quest
                   </h1>
                   {profile && (
@@ -251,6 +259,20 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             </div>
             
             <div className="flex items-center gap-2">
+              <Button
+                onClick={() => setShowNotifications(true)}
+                variant="ghost"
+                size="sm"
+                className="text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/50 relative"
+              >
+                <Bell className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Notifications</span>
+                {notificationCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {notificationCount}
+                  </span>
+                )}
+              </Button>
               <Button
                 onClick={() => setShowSettings(true)}
                 variant="ghost"
@@ -275,12 +297,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="flex flex-wrap gap-2 mb-6">
+      <div className="w-full px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="flex flex-wrap gap-2 mb-6 overflow-x-auto">
           <Button
             onClick={() => setActiveTab('tasks')}
             variant={activeTab === 'tasks' ? 'default' : 'outline'}
             className={activeTab === 'tasks' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+            size="sm"
           >
             Tasks & Progress
           </Button>
@@ -290,6 +313,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={() => setActiveTab('calendar')}
                 variant={activeTab === 'calendar' ? 'default' : 'outline'}
                 className={activeTab === 'calendar' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                size="sm"
               >
                 Calendar
               </Button>
@@ -297,6 +321,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={() => setActiveTab('teams')}
                 variant={activeTab === 'teams' ? 'default' : 'outline'}
                 className={activeTab === 'teams' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                size="sm"
               >
                 Teams
               </Button>
@@ -304,6 +329,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={() => setActiveTab('partners')}
                 variant={activeTab === 'partners' ? 'default' : 'outline'}
                 className={activeTab === 'partners' ? 'bg-purple-600 hover:bg-purple-700' : ''}
+                size="sm"
               >
                 Partners
               </Button>
@@ -313,11 +339,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <main className="w-full px-4 sm:px-6 lg:px-8 pb-8">
         {activeTab === 'tasks' && (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-8">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-3 space-y-8">
+            <div className="lg:col-span-3 space-y-6 lg:space-y-8">
               {/* Workspace Selector */}
               {profile && (
                 <WorkspaceSelector
@@ -334,17 +360,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               
               {/* Schedule Board */}
               <ScheduleBoard tasks={tasks} onTasksChange={handleTaskComplete} />
-              
-              {/* Notifications Panel */}
-              <NotificationPanel 
-                tasks={tasks} 
-                isOpen={showNotifications}
-                onClose={() => setShowNotifications(false)}
-              />
             </div>
 
             {/* Right Column - Sidebar */}
-            <div className="lg:col-span-1 space-y-6">
+            <div className="lg:col-span-1 space-y-4 lg:space-y-6">
               {/* Task Form */}
               <TaskForm onTaskAdded={fetchTasks} />
               
@@ -355,7 +374,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         )}
 
         {activeTab === 'calendar' && profile && (
-          <CalendarView userPlan={profile.plan || 'free'} />
+          <CalendarView tasks={tasks} userPlan={profile.plan || 'free'} />
         )}
 
         {activeTab === 'teams' && profile && (
@@ -363,7 +382,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         )}
 
         {activeTab === 'partners' && profile && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
             <PartnerConnection userPlan={profile.plan || 'free'} />
             {/* Add partner progress sharing component here in the future */}
           </div>
@@ -374,6 +393,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       {showSettings && (
         <EnhancedSettingsPanel onClose={() => setShowSettings(false)} />
       )}
+
+      {/* Notifications Panel */}
+      <NotificationPanel 
+        tasks={tasks} 
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
 
       {/* PWA Install Prompt */}
       <PWAInstallPrompt />

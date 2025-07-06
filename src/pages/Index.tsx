@@ -45,7 +45,7 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
+      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
           <p className="text-purple-600 dark:text-purple-300 text-lg">Loading...</p>
@@ -56,12 +56,7 @@ const Index = () => {
 
   return (
     <ThemeProvider>
-      <div className="transition-colors duration-300">
-        {/* Debug indicator - remove after confirming it works */}
-        <div className="fixed top-5 left-0 bg-purple-500 text-white px-2 py-1 text-xs z-50">
-          Index: {user ? 'Authenticated' : 'Not Authenticated'} ✓
-        </div>
-        
+      <div className="w-full min-h-screen transition-colors duration-300">
         {user ? (
           <Dashboard onLogout={handleLogout} />
         ) : (
