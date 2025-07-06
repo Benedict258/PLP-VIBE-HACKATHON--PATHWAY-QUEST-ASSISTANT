@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Users, Mail, Crown, Eye, Edit, MessageCircle, CheckSquare, Trash2 } from 'lucide-react';
+import { Users, Mail, Crown, Eye, Edit, MessageCircle, CheckSquare, Trash2, Plus } from 'lucide-react';
 import TeamCreationForm from './TeamCreationForm';
 
 interface Team {
