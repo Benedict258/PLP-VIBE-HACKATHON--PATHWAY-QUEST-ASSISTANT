@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Users, Plus, Mail, Crown, Eye, Edit, MessageCircle, CheckSquare } from 'lucide-react';
+import { Users, Mail, Crown, Eye, Edit, MessageCircle, CheckSquare, Trash2 } from 'lucide-react';
+import TeamCreationForm from './TeamCreationForm';
 
 interface Team {
   id: string;
@@ -43,15 +43,16 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [teamTasks, setTeamTasks] = useState<TeamTask[]>([]);
-  const [newTeamName, setNewTeamName] = useState('');
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [newTaskName, setNewTaskName] = useState('');
   const [loading, setLoading] = useState(false);
   const [activePanel, setActivePanel] = useState<'tasks' | 'members' | 'chat'>('tasks');
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (userPlan === 'premium') {
+      getCurrentUser();
       fetchTeams();
     }
   }, [userPlan]);
@@ -62,6 +63,11 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
       fetchTeamTasks();
     }
   }, [selectedTeam]);
+
+  const getCurrentUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setCurrentUser(user);
+  };
 
   const fetchTeams = async () => {
     try {
@@ -154,53 +160,6 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
         description: error.message,
         variant: "destructive",
       });
-    }
-  };
-
-  const createTeam = async () => {
-    if (!newTeamName.trim()) return;
-
-    setLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('teams')
-        .insert({
-          name: newTeamName.trim(),
-          owner_id: user.id
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Add creator as admin
-      await supabase
-        .from('team_members')
-        .insert({
-          team_id: data.id,
-          user_id: user.id,
-          role: 'admin'
-        });
-
-      setNewTeamName('');
-      fetchTeams();
-      setSelectedTeam(data);
-      
-      toast({
-        title: "Team created",
-        description: `Created "${data.name}" team successfully!`,
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error creating team",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -315,6 +274,113 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
     return member.profiles?.name || 'Unknown User';
   };
 
+  const createTeam = async (name: string, emoji: string, color: string) => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('teams')
+        .insert({
+          name: name,
+          owner_id: user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Add creator as admin
+      await supabase
+        .from('team_members')
+        .insert({
+          team_id: data.id,
+          user_id: user.id,
+          role: 'admin'
+        });
+
+      fetchTeams();
+      setSelectedTeam(data);
+      
+      toast({
+        title: "Team created",
+        description: `Created "${data.name}" team successfully!`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error creating team",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteTeam = async (teamId: string, teamName: string) => {
+    const isOwner = currentUser && selectedTeam && selectedTeam.owner_id === currentUser.id;
+    
+    if (!isOwner) {
+      toast({
+        title: "Permission denied",
+        description: "Only the team owner can delete this team.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete "${teamName}"? This will permanently remove the team and all its data for all members.`)) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Delete team tasks first
+      await supabase
+        .from('team_tasks')
+        .delete()
+        .eq('team_id', teamId);
+
+      // Delete team members
+      await supabase
+        .from('team_members')
+        .delete()
+        .eq('team_id', teamId);
+
+      // Delete team
+      const { error } = await supabase
+        .from('teams')
+        .delete()
+        .eq('id', teamId);
+
+      if (error) throw error;
+
+      const remainingTeams = teams.filter(t => t.id !== teamId);
+      setTeams(remainingTeams);
+      
+      // Switch to first available team if current one was deleted
+      if (selectedTeam?.id === teamId && remainingTeams.length > 0) {
+        setSelectedTeam(remainingTeams[0]);
+      } else if (selectedTeam?.id === teamId) {
+        setSelectedTeam(null);
+      }
+      
+      toast({
+        title: "Team deleted",
+        description: `Deleted "${teamName}" team and all associated data.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error deleting team",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (userPlan !== 'premium') {
     return (
       <Card className="border-purple-200 bg-white/50 backdrop-blur-sm">
@@ -348,7 +414,7 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Team Creation */}
-      <Card className="border-purple-200 bg-white/50 backdrop-blur-sm">
+      <Card className="border-purple-200 bg-white/50 backdrop-blur-sm shadow-lg">
         <CardHeader className="pb-3 sm:pb-6">
           <CardTitle className="flex items-center gap-2 text-purple-700 text-lg sm:text-xl">
             <Users className="w-5 h-5" />
@@ -356,22 +422,11 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Input
-              value={newTeamName}
-              onChange={(e) => setNewTeamName(e.target.value)}
-              placeholder="Enter team name"
-              className="flex-1"
-            />
-            <Button
-              onClick={createTeam}
-              disabled={loading || !newTeamName.trim() || teams.length >= 3}
-              className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Team
-            </Button>
-          </div>
+          <TeamCreationForm
+            onCreateTeam={createTeam}
+            loading={loading}
+            disabled={teams.length >= 3}
+          />
           {teams.length >= 3 && (
             <p className="text-sm text-amber-600">Maximum 3 teams allowed</p>
           )}
@@ -382,18 +437,29 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
       {teams.length > 0 && (
         <div className="flex gap-2 overflow-x-auto pb-2">
           {teams.map((team) => (
-            <Button
-              key={team.id}
-              variant={selectedTeam?.id === team.id ? "default" : "outline"}
-              onClick={() => setSelectedTeam(team)}
-              className={`whitespace-nowrap flex-shrink-0 ${
-                selectedTeam?.id === team.id 
-                  ? 'bg-purple-600 hover:bg-purple-700' 
-                  : 'hover:bg-purple-50'
-              }`}
-            >
-              {team.name}
-            </Button>
+            <div key={team.id} className="flex items-center gap-2 flex-shrink-0">
+              <Button
+                variant={selectedTeam?.id === team.id ? "default" : "outline"}
+                onClick={() => setSelectedTeam(team)}
+                className={`whitespace-nowrap ${
+                  selectedTeam?.id === team.id 
+                    ? 'bg-purple-600 hover:bg-purple-700' 
+                    : 'hover:bg-purple-50'
+                }`}
+              >
+                {team.name}
+              </Button>
+              {currentUser && team.owner_id === currentUser.id && (
+                <Button
+                  onClick={() => deleteTeam(team.id, team.name)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           ))}
         </div>
       )}

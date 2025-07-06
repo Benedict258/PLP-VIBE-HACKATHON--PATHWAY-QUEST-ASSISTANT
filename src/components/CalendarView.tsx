@@ -2,12 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { CalendarDays } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { format, parseISO, isSameDay } from 'date-fns';
+import { format } from 'date-fns';
+import CalendarModal from './CalendarModal';
 
 interface Task {
   id: string;
@@ -36,6 +35,7 @@ const CalendarView = ({ tasks = [], userPlan }: CalendarViewProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calendarTasks, setCalendarTasks] = useState<CalendarTask[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const { toast } = useToast();
 
   // Category colors for dots
@@ -121,6 +121,13 @@ const CalendarView = ({ tasks = [], userPlan }: CalendarViewProps) => {
     );
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
+      setShowModal(true);
+    }
+  };
+
   if (userPlan === 'free') {
     return (
       <Card className="w-full max-w-4xl mx-auto">
@@ -146,100 +153,46 @@ const CalendarView = ({ tasks = [], userPlan }: CalendarViewProps) => {
   const selectedTasks = getTasksForDate(selectedDate);
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendar */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CalendarDays className="w-5 h-5" />
-              Task Calendar
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => date && setSelectedDate(date)}
-              className="w-full"
-              components={{
-                DayContent: ({ date }) => renderDayContent(date as Date)
-              }}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Selected Date Tasks */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">
-              {format(selectedDate, 'MMM dd, yyyy')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {selectedTasks.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">
-                No tasks scheduled for this date
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {selectedTasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className={`p-3 rounded-lg border-l-4 ${
-                      categoryColors[task.category]?.replace('bg-', 'border-') || 'border-gray-500'
-                    } bg-gray-50 dark:bg-gray-800`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-sm">{task.title}</h4>
-                      {task.completed && (
-                        <Badge variant="secondary" className="text-xs">
-                          Completed
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge 
-                        variant="outline" 
-                        className="text-xs"
-                        style={{ 
-                          borderColor: categoryColors[task.category]?.replace('bg-', ''),
-                          color: categoryColors[task.category]?.replace('bg-', '')
-                        }}
-                      >
-                        {task.category}
-                      </Badge>
-                      {task.time && (
-                        <span className="text-xs text-gray-500">{task.time}</span>
-                      )}
-                    </div>
-                    {task.description && (
-                      <p className="text-sm text-gray-600 mt-2">{task.description}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Category Legend */}
-      <Card>
+    <div className="w-full max-w-6xl mx-auto">
+      {/* Main Calendar - Full Screen */}
+      <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-lg">Category Legend</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <CalendarDays className="w-6 h-6" />
+            Task Calendar
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
-            {Object.entries(categoryColors).map(([category, color]) => (
-              <div key={category} className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${color}`} />
-                <span className="text-sm">{category}</span>
-              </div>
-            ))}
-          </div>
+        <CardContent className="p-6">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={handleDateSelect}
+            className="w-full mx-auto"
+            components={{
+              DayContent: ({ date }) => renderDayContent(date as Date)
+            }}
+            classNames={{
+              months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full",
+              month: "space-y-4 w-full",
+              caption: "flex justify-center pt-1 relative items-center text-lg font-semibold",
+              table: "w-full border-collapse space-y-2",
+              head_row: "flex w-full",
+              head_cell: "text-muted-foreground rounded-md flex-1 font-normal text-sm text-center p-2",
+              row: "flex w-full mt-2",
+              cell: "flex-1 h-14 text-center text-sm p-1 relative hover:bg-accent rounded-md transition-colors cursor-pointer",
+              day: "h-full w-full p-0 font-normal hover:bg-accent hover:text-accent-foreground rounded-md transition-colors flex flex-col items-center justify-center"
+            }}
+          />
         </CardContent>
       </Card>
+
+      {/* Calendar Modal */}
+      <CalendarModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        selectedDate={selectedDate}
+        tasks={selectedTasks}
+      />
     </div>
   );
 };

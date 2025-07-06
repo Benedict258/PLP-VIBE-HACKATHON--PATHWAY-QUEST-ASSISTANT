@@ -86,6 +86,18 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* SUI Blockchain Theme */
+  .theme-sui {
+    --primary: 203 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --background: 240 10% 4%;
+    --card: 240 10% 6%;
+    --card-foreground: 203 100% 90%;
+    --accent: 203 100% 70%;
+    --accent-foreground: 240 10% 4%;
+    --border: 203 30% 20%;
+  }
 }
 
 @layer base {
@@ -101,12 +113,17 @@ All colors MUST be HSL.
     box-sizing: border-box;
   }
 
-  /* Remove default margins and paddings that cause edge spacing */
+  /* Remove ALL default margins and paddings for fullscreen layout */
   body {
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
     width: 100vw;
     overflow-x: hidden;
+  }
+
+  #root {
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* Ensure full width containers */
@@ -114,7 +131,7 @@ All colors MUST be HSL.
     width: 100% !important;
   }
 
-  /* Mobile responsive improvements */
+  /* Enhanced Mobile Responsiveness */
   @media (max-width: 768px) {
     .grid-cols-1 {
       grid-template-columns: 1fr;
@@ -131,16 +148,116 @@ All colors MUST be HSL.
       gap: 1rem;
     }
     
-    /* Improve mobile padding */
+    /* Improve mobile padding - remove edge padding */
     .px-4 {
-      padding-left: 1rem;
-      padding-right: 1rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
     }
+
+    /* Mobile-specific fullscreen */
+    .min-h-screen {
+      min-height: 100vh;
+      min-height: 100dvh; /* Dynamic viewport height for mobile */
+    }
+
+    /* Fix modal overlays on mobile */
+    .fixed.inset-0 {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    /* Prevent horizontal scroll on mobile */
+    .overflow-x-auto {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  /* Fix for very small screens */
+  @media (max-width: 425px) {
+    .text-xl {
+      font-size: 1.125rem;
+    }
+    
+    .text-2xl {
+      font-size: 1.25rem;
+    }
+
+    .px-4 {
+      padding-left: 0.25rem;
+      padding-right: 0.25rem;
+    }
+
+    .gap-4 {
+      gap: 0.5rem;
+    }
+  }
+
+  /* Dark mode visibility fixes */
+  .dark {
+    color-scheme: dark;
+  }
+
+  .dark * {
+    border-color: hsl(var(--border));
+  }
+
+  .dark .text-gray-900 {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .dark .text-gray-700 {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  .dark .bg-white {
+    background-color: hsl(var(--card)) !important;
   }
 
   /* Smooth transitions */
   * {
-    transition: colors 200ms ease;
+    transition: colors 200ms ease, background-color 200ms ease, border-color 200ms ease;
+  }
+
+  /* Modern UI Enhancements */
+  .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+
+  /* Rounded modern edges */
+  .rounded-xl {
+    border-radius: 0.75rem;
+  }
+
+  /* Tech dashboard gradients */
+  .bg-gradient-to-r {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+  }
+
+  .bg-gradient-to-br {
+    background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+  }
+
+  /* Calendar enhancements */
+  .calendar-day-content {
+    @apply flex flex-col items-center justify-center h-full w-full p-1;
+  }
+
+  .calendar-dots {
+    @apply flex flex-wrap gap-0.5 mt-1 justify-center max-w-full;
   }
 }
 
@@ -174,6 +291,26 @@ All colors MUST be HSL.
   }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .animate-in {
   animation-duration: 0.3s;
   animation-fill-mode: both;
@@ -181,4 +318,35 @@ All colors MUST be HSL.
 
 .slide-in-from-bottom-5 {
   animation-name: slide-in-from-bottom-5;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out;
+}
+
+/* PWA and Installation */
+.pwa-install-prompt {
+  animation: slideUp 0.5s ease-out;
+}
+
+/* Notification enhancements */
+.notification-panel {
+  @apply animate-slideUp;
+}
+
+.notification-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }

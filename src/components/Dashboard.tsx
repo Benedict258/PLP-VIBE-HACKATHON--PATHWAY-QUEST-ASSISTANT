@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, User, Settings, Bell } from 'lucide-react';
+import { LogOut, User, Settings } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import TaskForm from './TaskForm';
 import ScheduleBoard from './ScheduleBoard';
@@ -13,10 +13,11 @@ import EnhancedSettingsPanel from './EnhancedSettingsPanel';
 import StreakCounter from './StreakCounter';
 import PWAInstallPrompt from './PWAInstallPrompt';
 import PlanSelection from './PlanSelection';
-import WorkspaceSelector from './WorkspaceSelector';
 import PartnerConnection from './PartnerConnection';
 import CalendarView from './CalendarView';
 import TeamDashboard from './TeamDashboard';
+import NotificationBadge from './NotificationBadge';
+import WorkspaceSetup from './WorkspaceSetup';
 
 interface Task {
   id: string;
@@ -34,13 +35,6 @@ interface Profile {
   plan: string;
 }
 
-interface Workspace {
-  id: string;
-  name: string;
-  emoji: string;
-  color: string;
-}
-
 interface DashboardProps {
   onLogout: () => void;
 }
@@ -48,12 +42,12 @@ interface DashboardProps {
 const Dashboard = ({ onLogout }: DashboardProps) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showPlanSelection, setShowPlanSelection] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showWorkspaceSetup, setShowWorkspaceSetup] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   const [activeTab, setActiveTab] = useState<'tasks' | 'calendar' | 'teams' | 'partners'>('tasks');
   const { toast } = useToast();
@@ -105,6 +99,18 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       
       console.log('Profile data:', data);
       setProfile(data);
+      
+      // Check if user needs workspace setup
+      const { data: workspaces } = await supabase
+        .from('workspaces')
+        .select('*')
+        .eq('user_id', user.id)
+        .limit(1);
+
+      if (!workspaces || workspaces.length === 0) {
+        setShowWorkspaceSetup(true);
+        return;
+      }
       
       // Check if user needs to select a plan
       if (!data.plan || data.plan === null || data.plan === 'free') {
@@ -200,8 +206,36 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     });
   };
 
+  const handleWorkspaceSetup = async (workspaceName: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      await supabase
+        .from('workspaces')
+        .insert({
+          user_id: user.id,
+          name: workspaceName,
+          emoji: '🏠',
+          color: '#8B5CF6'
+        });
+
+      setShowWorkspaceSetup(false);
+      toast({
+        title: "Workspace created!",
+        description: `Welcome to your "${workspaceName}" workspace`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error creating workspace",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   // Add debugging render
-  console.log('Dashboard render state:', { loading, showPlanSelection, profile, user });
+  console.log('Dashboard render state:', { loading, showPlanSelection, showWorkspaceSetup, profile, user });
 
   if (loading) {
     return (
@@ -211,6 +245,12 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           <p className="text-purple-600 dark:text-purple-300 text-lg">Loading your dashboard...</p>
         </div>
       </div>
+    );
+  }
+
+  if (showWorkspaceSetup) {
+    return (
+      <WorkspaceSetup onSetupComplete={handleWorkspaceSetup} />
     );
   }
 
@@ -232,7 +272,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                   <span className="text-white font-bold text-lg">PQ</span>
                 </div>
                 <div>
@@ -242,7 +282,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                   {profile && (
                     <p className="text-sm text-purple-600 dark:text-purple-300">
                       Welcome back, {profile.name}! 👋
-                      <span className="ml-2 bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full text-xs font-medium capitalize">
+                      <span className="ml-2 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full text-xs font-medium capitalize">
                         {profile.plan || 'free'}
                       </span>
                     </p>
@@ -259,20 +299,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             </div>
             
             <div className="flex items-center gap-2">
-              <Button
+              <NotificationBadge
+                count={notificationCount}
                 onClick={() => setShowNotifications(true)}
-                variant="ghost"
-                size="sm"
-                className="text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/50 relative"
-              >
-                <Bell className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Notifications</span>
-                {notificationCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {notificationCount}
-                  </span>
-                )}
-              </Button>
+              />
               <Button
                 onClick={() => setShowSettings(true)}
                 variant="ghost"
@@ -344,15 +374,6 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-8">
             {/* Left Column - Main Content */}
             <div className="lg:col-span-3 space-y-6 lg:space-y-8">
-              {/* Workspace Selector */}
-              {profile && (
-                <WorkspaceSelector
-                  currentWorkspace={currentWorkspace}
-                  onWorkspaceChange={setCurrentWorkspace}
-                  userPlan={profile.plan || 'free'}
-                />
-              )}
-
               {/* Streak Counter */}
               {profile && profile.plan !== 'free' && (
                 <StreakCounter streak={profile.current_streak} />
