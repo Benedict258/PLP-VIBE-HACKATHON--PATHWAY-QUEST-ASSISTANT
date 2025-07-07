@@ -43,15 +43,14 @@ const InviteManager = () => {
 
       if (error) throw error;
 
-      // ✅ UPDATED: Use secure view user_profiles instead of profiles
       const invitesWithSenders = await Promise.all(
         (data || []).map(async (invite) => {
           const { data: profile } = await supabase
-            .from('user_profiles') // ✅ Make sure this view exists
-            .select('email, id') // If you’ve added name, include 'name' too
-            .eq('id', invite.sender_id)
+            .from('user_profiles') // ✅ custom view
+            .select('user_email, user_id, name') // 👈 include only columns present in the view
+            .eq('user_id', invite.sender_id) // 👈 match by user_id, not id
             .single();
-
+      
           return {
             id: invite.id,
             type: invite.type as 'team' | 'partner',
@@ -60,7 +59,7 @@ const InviteManager = () => {
             team_id: invite.team_id || undefined,
             status: invite.status as 'pending' | 'accepted' | 'declined',
             created_at: invite.created_at || new Date().toISOString(),
-            sender_name: profile?.email || 'Unknown User', // Replace with profile?.name if name exists
+            sender_name: profile?.name || 'Unknown User', // ✅ uses name from view
             team_name: invite.teams?.name || undefined
           };
         })
