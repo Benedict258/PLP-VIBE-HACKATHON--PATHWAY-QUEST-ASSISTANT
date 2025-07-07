@@ -174,29 +174,27 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
     return systemNotifications;
   };
 
-  const setupRealtimeSubscription = () => {
-    const { data: { user } } = supabase.auth.getUser();
-    user.then(userData => {
-      if (!userData.user) return;
+  const setupRealtimeSubscription = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
-      const channel = supabase
-        .channel('notifications')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'notifications',
-            filter: `user_id=eq.${userData.user.id}`
-          },
-          () => fetchNotifications()
-        )
-        .subscribe();
+    const channel = supabase
+      .channel('notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => fetchNotifications()
+      )
+      .subscribe();
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    });
+    return () => {
+      supabase.removeChannel(channel);
+    };
   };
 
   const markAsRead = async (notificationId: string) => {

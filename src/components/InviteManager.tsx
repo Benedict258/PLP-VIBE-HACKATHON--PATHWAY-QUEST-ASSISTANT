@@ -54,8 +54,13 @@ const InviteManager = () => {
             .single();
 
           return {
-            ...invite,
+            id: invite.id,
             type: invite.type as 'team' | 'partner',
+            sender_id: invite.sender_id,
+            receiver_email: invite.receiver_email,
+            team_id: invite.team_id || undefined,
+            status: invite.status as 'pending' | 'accepted' | 'declined',
+            created_at: invite.created_at || new Date().toISOString(),
             sender_name: profile?.name || 'Unknown User',
             team_name: invite.teams?.name || undefined
           };
