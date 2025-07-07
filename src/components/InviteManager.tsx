@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -44,12 +43,12 @@ const InviteManager = () => {
 
       if (error) throw error;
 
-      // Get sender profiles separately to avoid relation errors
+      // ✅ UPDATED: Use secure view user_profiles instead of profiles
       const invitesWithSenders = await Promise.all(
         (data || []).map(async (invite) => {
           const { data: profile } = await supabase
-            .from('profiles')
-            .select('name')
+            .from('user_profiles') // ✅ Make sure this view exists
+            .select('email, id') // If you’ve added name, include 'name' too
             .eq('id', invite.sender_id)
             .single();
 
@@ -61,7 +60,7 @@ const InviteManager = () => {
             team_id: invite.team_id || undefined,
             status: invite.status as 'pending' | 'accepted' | 'declined',
             created_at: invite.created_at || new Date().toISOString(),
-            sender_name: profile?.name || 'Unknown User',
+            sender_name: profile?.email || 'Unknown User', // Replace with profile?.name if name exists
             team_name: invite.teams?.name || undefined
           };
         })
@@ -85,7 +84,6 @@ const InviteManager = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Update invite status
       const { error: updateError } = await supabase
         .from('invites')
         .update({ status })
@@ -95,7 +93,6 @@ const InviteManager = () => {
 
       if (status === 'accepted') {
         if (type === 'team' && teamId) {
-          // Add user to team
           const { error: memberError } = await supabase
             .from('team_members')
             .insert({
@@ -111,7 +108,6 @@ const InviteManager = () => {
             description: "You've joined the team successfully.",
           });
         } else if (type === 'partner') {
-          // Create chat room for partnership
           const { data: chatRoom, error: chatError } = await supabase
             .from('chat_rooms')
             .insert({})
@@ -120,10 +116,9 @@ const InviteManager = () => {
 
           if (chatError) throw chatError;
 
-          // Update partnership with chat room
           const { error: partnerError } = await supabase
             .from('partners')
-            .update({ 
+            .update({
               status: 'accepted',
               chat_room_id: chatRoom.id,
               partner_id: user.id
@@ -144,7 +139,7 @@ const InviteManager = () => {
         });
       }
 
-      fetchInvites(); // Refresh invites
+      fetchInvites();
     } catch (error: any) {
       toast({
         title: "Error responding to invite",
