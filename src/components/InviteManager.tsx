@@ -36,7 +36,6 @@ const InviteManager = () => {
         .from('invites')
         .select(`
           *,
-          profiles!invites_sender_id_fkey(name),
           teams(name)
         `)
         .eq('receiver_email', user.email)
@@ -45,13 +44,25 @@ const InviteManager = () => {
 
       if (error) throw error;
 
-      const formattedInvites = data?.map(invite => ({
-        ...invite,
-        sender_name: invite.profiles?.name || 'Unknown User',
-        team_name: invite.teams?.name
-      })) || [];
+      // Get sender profiles separately to avoid relation errors
+      const invitesWithSenders = await Promise.all(
+        (data || []).map(async (invite) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('name')
+            .eq('id', invite.sender_id)
+            .single();
 
-      setInvites(formattedInvites);
+          return {
+            ...invite,
+            type: invite.type as 'team' | 'partner',
+            sender_name: profile?.name || 'Unknown User',
+            team_name: invite.teams?.name || undefined
+          };
+        })
+      );
+
+      setInvites(invitesWithSenders);
     } catch (error: any) {
       console.error('Error fetching invites:', error);
       toast({

@@ -77,25 +77,33 @@ const PartnerChat = () => {
 
       const { data, error } = await supabase
         .from('partners')
-        .select(`
-          *,
-          profiles!fk_partner_profile(name)
-        `)
+        .select('*')
         .or(`user_id.eq.${user.id},partner_id.eq.${user.id}`)
         .eq('status', 'accepted')
         .not('chat_room_id', 'is', null);
 
       if (error) throw error;
 
-      const formattedPartners = data?.map(partner => ({
-        ...partner,
-        partner_name: partner.profiles?.name || partner.partner_email
-      })) || [];
+      // Get partner profiles separately to avoid relation errors
+      const partnersWithProfiles = await Promise.all(
+        (data || []).map(async (partner) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('name')
+            .eq('id', partner.partner_id || partner.user_id)
+            .single();
 
-      setPartners(formattedPartners);
+          return {
+            ...partner,
+            partner_name: profile?.name || partner.partner_email
+          };
+        })
+      );
+
+      setPartners(partnersWithProfiles);
       
-      if (formattedPartners.length > 0 && !selectedPartner) {
-        setSelectedPartner(formattedPartners[0]);
+      if (partnersWithProfiles.length > 0 && !selectedPartner) {
+        setSelectedPartner(partnersWithProfiles[0]);
       }
     } catch (error: any) {
       console.error('Error fetching partners:', error);
@@ -108,21 +116,29 @@ const PartnerChat = () => {
     try {
       const { data, error } = await supabase
         .from('messages')
-        .select(`
-          *,
-          profiles!messages_sender_id_fkey(name)
-        `)
+        .select('*')
         .eq('chat_room_id', selectedPartner.chat_room_id)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
 
-      const formattedMessages = data?.map(msg => ({
-        ...msg,
-        sender_name: msg.profiles?.name || 'Unknown'
-      })) || [];
+      // Get sender profiles separately to avoid relation errors
+      const messagesWithSenders = await Promise.all(
+        (data || []).map(async (msg) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('name')
+            .eq('id', msg.sender_id)
+            .single();
 
-      setMessages(formattedMessages);
+          return {
+            ...msg,
+            sender_name: profile?.name || 'Unknown'
+          };
+        })
+      );
+
+      setMessages(messagesWithSenders);
     } catch (error: any) {
       console.error('Error fetching messages:', error);
     }

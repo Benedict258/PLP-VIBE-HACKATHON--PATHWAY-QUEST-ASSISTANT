@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -122,10 +121,13 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
       }
 
       // Check for team invites
+      const { data: userResponse } = await supabase.auth.getUser();
+      if (!userResponse.user?.email) return systemNotifications;
+
       const { data: teamInvites } = await supabase
         .from('invites')
         .select('*')
-        .eq('receiver_email', (await supabase.auth.getUser()).data.user?.email)
+        .eq('receiver_email', userResponse.user.email)
         .eq('status', 'pending')
         .eq('type', 'team');
 
@@ -137,7 +139,7 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
             title: 'Team Invitation',
             message: 'You have a pending team invitation',
             read: false,
-            created_at: invite.created_at,
+            created_at: invite.created_at || new Date().toISOString(),
             data: { inviteId: invite.id }
           });
         });
@@ -147,7 +149,7 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
       const { data: partnerInvites } = await supabase
         .from('invites')
         .select('*')
-        .eq('receiver_email', (await supabase.auth.getUser()).data.user?.email)
+        .eq('receiver_email', userResponse.user.email)
         .eq('status', 'pending')
         .eq('type', 'partner');
 
@@ -159,7 +161,7 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
             title: 'Partnership Request',
             message: 'You have a new partnership request',
             read: false,
-            created_at: invite.created_at,
+            created_at: invite.created_at || new Date().toISOString(),
             data: { inviteId: invite.id }
           });
         });
@@ -174,25 +176,27 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
 
   const setupRealtimeSubscription = () => {
     const { data: { user } } = supabase.auth.getUser();
-    if (!user) return;
+    user.then(userData => {
+      if (!userData.user) return;
 
-    const channel = supabase
-      .channel('notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.then(u => u.user?.id)}`
-        },
-        () => fetchNotifications()
-      )
-      .subscribe();
+      const channel = supabase
+        .channel('notifications')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${userData.user.id}`
+          },
+          () => fetchNotifications()
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    });
   };
 
   const markAsRead = async (notificationId: string) => {
