@@ -168,8 +168,8 @@
   @apply text-gray-400;
 }
 
-.dark .text-gray-500 {
-  @apply text-gray-500;
+.text-subtle {
+  color: #6B7280; /* This is Tailwind's gray-500 */
 }
 
 /* Hover card styles */
