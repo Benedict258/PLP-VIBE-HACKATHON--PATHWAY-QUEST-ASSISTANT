@@ -59,7 +59,7 @@ const InviteManager = () => {
             team_id: invite.team_id || undefined,
             status: invite.status as 'pending' | 'accepted' | 'declined',
             created_at: invite.created_at || new Date().toISOString(),
-            sender_name: profile?.name || 'Unknown User', // ✅ uses name from view
+            sender_name: profile?.email || 'Unknown User', // ✅ uses name from view
             team_name: invite.teams?.name || undefined
           };
         })
