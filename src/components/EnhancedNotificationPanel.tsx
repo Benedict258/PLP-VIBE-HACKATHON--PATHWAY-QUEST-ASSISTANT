@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bell, Check, X, Settings, Users, MessageCircle, Calendar, CheckSquare } from 'lucide-react';
+import { Bell, Check, X, Users, MessageCircle, Calendar, CheckSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -281,10 +282,10 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-4 sm:pt-16">
-      <Card className="w-full max-w-md mx-4 max-h-[80vh] bg-white shadow-2xl border-blue-200">
-        <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <Card className="w-full max-w-md mx-4 max-h-[80vh] bg-white dark:bg-gray-800 shadow-2xl border-purple-200 dark:border-purple-700">
+        <CardHeader className="pb-3 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/50 dark:to-indigo-900/50">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg text-blue-700">
+            <CardTitle className="flex items-center gap-2 text-lg text-purple-700 dark:text-purple-300">
               <Bell className="w-5 h-5" />
               Notifications
               {unreadCount > 0 && (
@@ -303,7 +304,7 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
               onClick={markAllAsRead}
               variant="ghost"
               size="sm"
-              className="self-start text-blue-600 hover:text-blue-700"
+              className="self-start text-purple-600 dark:text-purple-300 hover:text-purple-700 dark:hover:text-purple-200"
             >
               Mark all as read
             </Button>
@@ -314,11 +315,11 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
           <div className="max-h-96 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <Bell className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
                 <p>No notifications yet</p>
               </div>
             ) : (
@@ -326,8 +327,8 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 border-b border-gray-100 hover:bg-blue-50 transition-colors ${
-                      !notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                    className={`p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors ${
+                      !notification.read ? 'bg-purple-50 dark:bg-purple-900/30 border-l-4 border-l-purple-500' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -337,13 +338,13 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
-                            <p className="font-medium text-sm text-gray-900">
+                            <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
                               {notification.title}
                             </p>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                               {formatTimestamp(notification.created_at)}
                             </p>
                           </div>
@@ -353,7 +354,7 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
                                 onClick={() => markAsRead(notification.id)}
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/30"
                               >
                                 <Check className="w-3 h-3" />
                               </Button>
@@ -362,7 +363,7 @@ const EnhancedNotificationPanel = ({ isOpen, onClose, onNotificationCountChange 
                               onClick={() => deleteNotification(notification.id)}
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30"
                             >
                               <X className="w-3 h-3" />
                             </Button>

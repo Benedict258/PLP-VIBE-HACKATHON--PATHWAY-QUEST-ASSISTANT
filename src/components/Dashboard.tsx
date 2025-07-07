@@ -273,24 +273,24 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
   // Always render something visible - this is critical for preventing blank screens
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 transition-colors duration-300">
+    <div className="min-h-screen w-full bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-blue-200 shadow-lg sticky top-0 z-40 transition-colors duration-300 w-full">
+      <header className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-b border-purple-200 dark:border-purple-700 shadow-lg sticky top-0 z-40 transition-colors duration-300 w-full">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg">
                   <span className="text-white font-bold text-lg">PQ</span>
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+                  <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-700 bg-clip-text text-transparent">
                     Pathway Quest
                   </h1>
                   {profile && (
-                    <p className="text-sm text-blue-600">
+                    <p className="text-sm text-purple-600 dark:text-purple-300">
                       Welcome back, {profile.name}! 👋
-                      <span className="ml-2 bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium capitalize">
+                      <span className="ml-2 bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full text-xs font-medium capitalize">
                         {profile.plan || 'free'}
                       </span>
                     </p>
@@ -299,7 +299,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               </div>
               
               {user && (
-                <div className="hidden md:flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                <div className="hidden md:flex items-center gap-2 text-sm text-purple-600 dark:text-purple-300 bg-purple-50 dark:bg-purple-800/30 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-700">
                   <User className="w-4 h-4" />
                   {user.email}
                 </div>
@@ -315,7 +315,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={() => setShowSettings(true)}
                 variant="ghost"
                 size="sm"
-                className="text-blue-700 hover:bg-blue-50"
+                className="text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Settings</span>
@@ -324,7 +324,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={handleLogout}
                 variant="outline"
                 size="sm"
-                className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                className="border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Logout</span>
@@ -345,7 +345,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           <Button
             onClick={() => setActiveTab('tasks')}
             variant={activeTab === 'tasks' ? 'default' : 'outline'}
-            className={activeTab === 'tasks' ? 'bg-blue-600 hover:bg-blue-700' : 'border-blue-200 text-blue-600 hover:bg-blue-50'}
+            className={activeTab === 'tasks' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
             size="sm"
           >
             Tasks & Progress
@@ -355,7 +355,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('calendar')}
                 variant={activeTab === 'calendar' ? 'default' : 'outline'}
-                className={activeTab === 'calendar' ? 'bg-blue-600 hover:bg-blue-700' : 'border-blue-200 text-blue-600 hover:bg-blue-50'}
+                className={activeTab === 'calendar' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
                 size="sm"
               >
                 Calendar
@@ -363,7 +363,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('teams')}
                 variant={activeTab === 'teams' ? 'default' : 'outline'}
-                className={activeTab === 'teams' ? 'bg-blue-600 hover:bg-blue-700' : 'border-blue-200 text-blue-600 hover:bg-blue-50'}
+                className={activeTab === 'teams' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
                 size="sm"
               >
                 Teams
@@ -371,7 +371,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('partners')}
                 variant={activeTab === 'partners' ? 'default' : 'outline'}
-                className={activeTab === 'partners' ? 'bg-blue-600 hover:bg-blue-700' : 'border-blue-200 text-blue-600 hover:bg-blue-50'}
+                className={activeTab === 'partners' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
                 size="sm"
               >
                 Partners
@@ -384,26 +384,29 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       {/* Main Content */}
       <main className="w-full px-4 sm:px-6 lg:px-8 pb-8">
         {activeTab === 'tasks' && (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-8">
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-3 space-y-6 lg:space-y-8">
-              {/* Streak Counter */}
-              {profile && profile.plan !== 'free' && (
-                <StreakCounter streak={profile.current_streak} />
-              )}
-              
-              {/* Schedule Board */}
-              <ScheduleBoard tasks={tasks} onTasksChange={handleTaskComplete} />
-            </div>
-
-            {/* Right Column - Sidebar */}
-            <div className="lg:col-span-1 space-y-4 lg:space-y-6">
+          <div className="space-y-6">
+            {/* Horizontal Layout Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
               {/* Task Form */}
-              <TaskForm onTaskAdded={fetchTasks} />
+              <div className="lg:col-span-4">
+                <TaskForm onTaskAdded={fetchTasks} />
+              </div>
               
               {/* Progress Summary */}
-              <ProgressSummary tasks={tasks} />
+              <div className="lg:col-span-4">
+                <ProgressSummary tasks={tasks} />
+              </div>
+              
+              {/* Streak Counter */}
+              {profile && profile.plan !== 'free' && (
+                <div className="lg:col-span-4">
+                  <StreakCounter streak={profile.current_streak} />
+                </div>
+              )}
             </div>
+            
+            {/* Schedule Board - Full Width */}
+            <ScheduleBoard tasks={tasks} onTasksChange={handleTaskComplete} />
           </div>
         )}
 

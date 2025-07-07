@@ -1,9 +1,7 @@
 
-const CACHE_NAME = 'pathway-quest-v1';
+const CACHE_NAME = 'pathway-quest-v2';
 const urlsToCache = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png'
@@ -17,6 +15,7 @@ self.addEventListener('install', (event) => {
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting();
 });
 
 // Fetch event - serve from cache, fallback to network
@@ -43,4 +42,5 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  self.clients.claim();
 });

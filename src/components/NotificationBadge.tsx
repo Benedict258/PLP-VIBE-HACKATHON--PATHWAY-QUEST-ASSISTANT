@@ -19,7 +19,7 @@ const NotificationBadge = ({ count, onClick }: NotificationBadgeProps) => {
       <Bell className="w-4 h-4 mr-2" />
       <span className="hidden sm:inline">Notifications</span>
       {count > 0 && (
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center min-w-[20px]">
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center min-w-[20px] notification-badge">
           {count > 99 ? '99+' : count}
         </span>
       )}
