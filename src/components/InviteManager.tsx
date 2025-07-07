@@ -47,7 +47,7 @@ const InviteManager = () => {
         (data || []).map(async (invite) => {
           const { data: profile } = await supabase
             .from('user_profiles') // ✅ custom view
-            .select('user_email, user_id, name') // 👈 include only columns present in the view
+            .select('email, id') // or 'user_email, user_id' if that's the actual column name
             .eq('user_id', invite.sender_id) // 👈 match by user_id, not id
             .single();
       
