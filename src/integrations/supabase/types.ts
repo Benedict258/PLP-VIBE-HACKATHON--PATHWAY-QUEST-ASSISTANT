@@ -87,6 +87,77 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          time: string | null
+          title: string
+          user_id: string
+          venue: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: string
+          time?: string | null
+          title: string
+          user_id: string
+          venue?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          time?: string | null
+          title?: string
+          user_id?: string
+          venue?: string | null
+        }
+        Relationships: []
+      }
+      invites: {
+        Row: {
+          created_at: string | null
+          id: string
+          receiver_email: string
+          sender_id: string
+          status: string
+          team_id: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          receiver_email: string
+          sender_id: string
+          status?: string
+          team_id?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          receiver_email?: string
+          sender_id?: string
+          status?: string
+          team_id?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invites_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           chat_room_id: string
@@ -118,6 +189,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          message: string
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          message: string
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       partner_tasks: {
         Row: {
@@ -204,6 +308,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           current_streak: number
+          email: string | null
           first_name: string | null
           id: string
           last_completed_date: string | null
@@ -217,6 +322,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           current_streak?: number
+          email?: string | null
           first_name?: string | null
           id: string
           last_completed_date?: string | null
@@ -230,6 +336,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           current_streak?: number
+          email?: string | null
           first_name?: string | null
           id?: string
           last_completed_date?: string | null

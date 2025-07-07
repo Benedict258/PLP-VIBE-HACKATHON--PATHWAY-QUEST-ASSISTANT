@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -169,44 +168,79 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
 
     setLoading(true);
     try {
-      // Check if user exists by email/name in profiles
+      // Check if user exists by email (case-insensitive)
       const { data: profiles, error: profileError } = await supabase
         .from('profiles')
-        .select('id, name')
-        .or(`name.ilike.%${newMemberEmail}%`);
+        .select('id, name, email')
+        .ilike('email', newMemberEmail.trim());
 
       if (profileError) throw profileError;
 
       if (!profiles || profiles.length === 0) {
         toast({
           title: "User not found",
-          description: "Please make sure the user has a Pathway Quest account.",
+          description: "Please make sure the user has a Pathway Quest account with this email.",
           variant: "destructive",
         });
         return;
       }
 
-      // Add to team
-      const { error } = await supabase
+      const user = profiles[0];
+
+      // Check if user is already a team member
+      const { data: existingMember } = await supabase
         .from('team_members')
+        .select('id')
+        .eq('team_id', selectedTeam.id)
+        .eq('user_id', user.id)
+        .single();
+
+      if (existingMember) {
+        toast({
+          title: "User already in team",
+          description: "This user is already a member of this team.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create invite
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) return;
+
+      const { error: inviteError } = await supabase
+        .from('invites')
         .insert({
-          team_id: selectedTeam.id,
-          user_id: profiles[0].id,
-          role: 'editor'
+          type: 'team',
+          sender_id: currentUser.id,
+          receiver_email: user.email,
+          team_id: selectedTeam.id
         });
 
-      if (error) throw error;
+      if (inviteError) throw inviteError;
+
+      // Create notification for the invited user
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          user_id: user.id,
+          type: 'team_invite',
+          title: 'Team Invitation',
+          message: `You've been invited to join "${selectedTeam.name}"`,
+          data: { teamId: selectedTeam.id, teamName: selectedTeam.name }
+        });
+
+      if (notificationError) console.error('Error creating notification:', notificationError);
 
       setNewMemberEmail('');
-      fetchTeamMembers();
       
       toast({
-        title: "Member invited",
-        description: `Added ${newMemberEmail} to the team!`,
+        title: "Invitation sent",
+        description: `Invitation sent to ${newMemberEmail}. They will receive a notification.`,
       });
     } catch (error: any) {
       toast({
-        title: "Error inviting member",
+        title: "Error sending invitation",
         description: error.message,
         variant: "destructive",
       });
@@ -226,7 +260,7 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
           team_id: selectedTeam.id,
           name: newTaskName.trim(),
           category: 'Team Task',
-          day: new Date().toISOString().split('T')[0]
+          day: new Date().toISOString().split('T')[0] // Proper date format
         });
 
       if (error) throw error;
@@ -384,25 +418,25 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
 
   if (userPlan !== 'premium') {
     return (
-      <Card className="border-purple-200 bg-white/50 backdrop-blur-sm">
+      <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-100">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-purple-700">
+          <CardTitle className="flex items-center gap-2 text-blue-700">
             <Users className="w-5 h-5" />
             Team Dashboards
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 sm:py-12">
-            <Users className="w-16 h-16 sm:w-20 sm:h-20 text-gray-300 mx-auto mb-4 sm:mb-6" />
+            <Users className="w-16 h-16 sm:w-20 sm:h-20 text-blue-300 mx-auto mb-4 sm:mb-6" />
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-3">
               Team Collaboration
             </h3>
             <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6 px-4">
               Create teams, assign tasks, and collaborate with your colleagues
             </p>
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 sm:p-6 max-w-md mx-auto">
-              <p className="text-purple-700 font-medium mb-2">🔒 Premium Feature</p>
-              <p className="text-sm sm:text-base text-purple-600">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6 max-w-md mx-auto">
+              <p className="text-blue-700 font-medium mb-2">🔒 Premium Feature</p>
+              <p className="text-sm sm:text-base text-blue-600">
                 Upgrade to Premium to access team dashboards and collaboration tools
               </p>
             </div>
@@ -415,9 +449,9 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Team Creation */}
-      <Card className="border-purple-200 bg-white/50 backdrop-blur-sm shadow-lg">
+      <Card className="border-blue-200 bg-gradient-to-r from-white to-blue-50 shadow-lg">
         <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="flex items-center gap-2 text-purple-700 text-lg sm:text-xl">
+          <CardTitle className="flex items-center gap-2 text-blue-700 text-lg sm:text-xl">
             <Users className="w-5 h-5" />
             Team Management
           </CardTitle>
@@ -444,8 +478,8 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                 onClick={() => setSelectedTeam(team)}
                 className={`whitespace-nowrap ${
                   selectedTeam?.id === team.id 
-                    ? 'bg-purple-600 hover:bg-purple-700' 
-                    : 'hover:bg-purple-50'
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                    : 'hover:bg-blue-50 border-blue-200 text-blue-600'
                 }`}
               >
                 {team.name}
@@ -467,19 +501,19 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
 
       {/* Selected Team Dashboard */}
       {selectedTeam && (
-        <Card className="border-purple-200 bg-white/50 backdrop-blur-sm">
-          <CardHeader className="pb-3 sm:pb-6">
-            <CardTitle className="flex items-center gap-2 text-purple-700">
+        <Card className="border-blue-200 bg-gradient-to-br from-white to-blue-50 shadow-lg">
+          <CardHeader className="pb-3 sm:pb-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <CardTitle className="flex items-center gap-2 text-blue-700">
               <Users className="w-5 h-5" />
               {selectedTeam.name}
             </CardTitle>
             {/* Panel Switcher */}
-            <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+            <div className="flex gap-1 bg-white rounded-lg p-1 border border-blue-200">
               <Button
                 variant={activePanel === 'tasks' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setActivePanel('tasks')}
-                className="flex-1"
+                className={`flex-1 ${activePanel === 'tasks' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'text-blue-600'}`}
               >
                 <CheckSquare className="w-4 h-4 mr-1" />
                 Tasks
@@ -488,7 +522,7 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                 variant={activePanel === 'members' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setActivePanel('members')}
-                className="flex-1"
+                className={`flex-1 ${activePanel === 'members' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'text-blue-600'}`}
               >
                 <Users className="w-4 h-4 mr-1" />
                 Members
@@ -497,7 +531,7 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                 variant={activePanel === 'chat' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setActivePanel('chat')}
-                className="flex-1"
+                className={`flex-1 ${activePanel === 'chat' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'text-blue-600'}`}
               >
                 <MessageCircle className="w-4 h-4 mr-1" />
                 Chat
@@ -513,12 +547,12 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                     value={newTaskName}
                     onChange={(e) => setNewTaskName(e.target.value)}
                     placeholder="Add team task"
-                    className="flex-1"
+                    className="flex-1 border-blue-200 focus:border-blue-400"
                   />
                   <Button
                     onClick={createTeamTask}
                     disabled={loading || !newTaskName.trim()}
-                    className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
+                    className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Task
@@ -528,22 +562,22 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {teamTasks.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
-                      <CheckSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <CheckSquare className="w-12 h-12 text-blue-300 mx-auto mb-3" />
                       <p>No team tasks yet. Create your first task!</p>
                     </div>
                   ) : (
                     teamTasks.map((task) => (
                       <div
                         key={task.id}
-                        className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200"
+                        className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100 hover:shadow-md transition-shadow"
                       >
                         <input
                           type="checkbox"
                           checked={task.completed}
                           onChange={() => toggleTaskComplete(task.id, task.completed)}
-                          className="w-4 h-4 text-purple-600"
+                          className="w-4 h-4 text-blue-600"
                         />
-                        <span className={`flex-1 ${task.completed ? 'line-through text-gray-500' : ''}`}>
+                        <span className={`flex-1 ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
                           {task.name}
                         </span>
                       </div>
@@ -559,13 +593,13 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                   <Input
                     value={newMemberEmail}
                     onChange={(e) => setNewMemberEmail(e.target.value)}
-                    placeholder="Member name or email"
-                    className="flex-1"
+                    placeholder="Member email address"
+                    className="flex-1 border-blue-200 focus:border-blue-400"
                   />
                   <Button
                     onClick={inviteTeamMember}
                     disabled={loading || !newMemberEmail.trim()}
-                    className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
+                    className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
                   >
                     <Mail className="w-4 h-4 mr-2" />
                     Invite
@@ -576,14 +610,14 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                   {teamMembers.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200"
+                      className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-100 hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-sm font-medium text-purple-600">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">
                           {getInitials(getMemberDisplayName(member))}
                         </div>
                         <div>
-                          <p className="font-medium text-sm">{getMemberDisplayName(member)}</p>
+                          <p className="font-medium text-sm text-gray-900">{getMemberDisplayName(member)}</p>
                           <div className="flex items-center gap-1 text-xs">
                             {member.role === 'admin' && (
                               <>
@@ -614,8 +648,11 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
 
             {activePanel === 'chat' && (
               <div className="text-center py-8 text-gray-500">
-                <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <MessageCircle className="w-12 h-12 text-blue-300 mx-auto mb-3" />
                 <p>Team chat coming soon!</p>
+                <p className="text-sm text-gray-400 mt-2">
+                  Real-time team collaboration features in development
+                </p>
               </div>
             )}
           </CardContent>
