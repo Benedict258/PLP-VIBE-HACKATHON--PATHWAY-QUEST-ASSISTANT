@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
@@ -134,12 +135,12 @@ textarea {
   }
   
   .task-completed {
-    @apply opacity-75 transition-opacity duration-300;
+    @apply opacity-60 transition-opacity duration-300;
   }
   
-  /* Collapsible animations */
+  /* Enhanced collapsible animations */
   .collapsible-content {
-    @apply transition-all duration-300 ease-in-out;
+    @apply transition-[height,opacity] duration-300 ease-in-out;
   }
   
   /* Category dot animations */
@@ -164,19 +165,82 @@ textarea {
   .interactive-element:hover {
     @apply transform translateY(-1px) shadow-md;
   }
+
+  /* Enhanced dropdown animations */
+  .dropdown-enter {
+    @apply transition-[height,opacity] duration-300 ease-out;
+    height: 0;
+    opacity: 0;
+  }
+  
+  .dropdown-enter-active {
+    height: auto;
+    opacity: 1;
+  }
+  
+  .dropdown-exit {
+    @apply transition-[height,opacity] duration-200 ease-in;
+    height: auto;
+    opacity: 1;
+  }
+  
+  .dropdown-exit-active {
+    height: 0;
+    opacity: 0;
+  }
+
+  /* Task completion visual states */
+  .task-complete-animation {
+    @apply transition-all duration-500 ease-out;
+  }
+  
+  .task-complete-animation.completed {
+    @apply opacity-60 scale-95;
+  }
+
+  /* Improved button hover states */
+  .task-action-button {
+    @apply transition-all duration-200 ease-in-out transform hover:scale-105;
+  }
 }
 
-/* Dark mode enhancements */
+/* Dark mode enhancements for better visibility */
 .dark {
   color-scheme: dark;
 }
 
 .dark .task-item {
-  @apply bg-gray-800/50 border-gray-700;
+  @apply bg-gray-800/50 border-gray-700/50;
 }
 
 .dark .task-item:hover {
-  @apply bg-gray-700/70 border-gray-600;
+  @apply bg-gray-700/70 border-gray-600/70;
+}
+
+/* Enhanced dark mode text visibility */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  @apply text-gray-100;
+}
+
+.dark p {
+  @apply text-gray-200;
+}
+
+.dark .text-violet-800 {
+  @apply text-violet-300;
+}
+
+.dark .text-violet-700 {
+  @apply text-violet-300;
+}
+
+.dark .text-violet-600 {
+  @apply text-violet-400;
 }
 
 /* Mobile touch targets */
@@ -188,6 +252,11 @@ textarea {
   button {
     @apply min-h-[44px] min-w-[44px] touch-manipulation;
   }
+
+  /* Mobile-specific dropdown behavior */
+  .collapsible-trigger {
+    @apply text-base p-3;
+  }
 }
 
 /* Accessibility improvements */
@@ -195,16 +264,30 @@ textarea {
   .task-item,
   .collapsible-content,
   .category-dot,
-  .interactive-element {
+  .interactive-element,
+  .dropdown-enter,
+  .dropdown-exit,
+  .task-complete-animation {
     @apply transition-none;
   }
 }
 
 /* Focus styles for keyboard navigation */
 .task-item:focus-within {
-  @apply ring-2 ring-purple-500 ring-offset-2 dark:ring-offset-gray-800;
+  @apply ring-2 ring-violet-500 ring-offset-2 dark:ring-offset-gray-800;
 }
 
 button:focus-visible {
-  @apply ring-2 ring-purple-500 ring-offset-2 dark:ring-offset-gray-800;
+  @apply ring-2 ring-violet-500 ring-offset-2 dark:ring-offset-gray-800;
+}
+
+/* Enhanced hover card styles */
+.hover-card {
+  @apply absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-violet-200 dark:border-violet-700 rounded-lg shadow-lg p-4 min-w-[280px] max-w-[320px] z-50 transition-all duration-200 ease-out transform;
+}
+
+@media (max-width: 768px) {
+  .hover-card {
+    @apply fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-0 max-w-[90vw] max-h-[70vh] overflow-y-auto;
+  }
 }
