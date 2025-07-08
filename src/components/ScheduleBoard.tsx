@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Trash2, Calendar, ChevronDown, ChevronRight } from 'lucide-react';
+import { Trash2, Calendar, ChevronDown, ChevronRight, Check } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import WeeklyScheduleHover from './WeeklyScheduleHover';
 
@@ -37,8 +36,11 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
   const { toast } = useToast();
   const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>({});
   const [deletingTasks, setDeletingTasks] = useState<{ [key: string]: boolean }>({});
+  const [completingTasks, setCompletingTasks] = useState<{ [key: string]: boolean }>({});
 
   const toggleTask = async (taskId: string, completed: boolean) => {
+    setCompletingTasks(prev => ({ ...prev, [taskId]: true }));
+    
     try {
       const { error } = await supabase
         .from('tasks')
@@ -58,11 +60,14 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setCompletingTasks(prev => ({ ...prev, [taskId]: false }));
     }
   };
 
   const deleteTask = async (taskId: string, taskName: string) => {
-    if (!confirm(`Are you sure you want to delete "${taskName}"?`)) return;
+    const confirmed = window.confirm(`Are you sure you want to delete "${taskName}"?`);
+    if (!confirmed) return;
     
     setDeletingTasks(prev => ({ ...prev, [taskId]: true }));
     
@@ -104,14 +109,15 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
     return colors[category as keyof typeof colors] || '#8B5CF6';
   };
 
-  const getCategoryBgColor = (category: string) => {
+  const getCategoryBgColor = (category: string, completed: boolean = false) => {
+    const baseOpacity = completed ? '5' : '10';
     const colors = {
-      'Programming': 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700/50',
-      'Mechatronics & Tech': 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700/50',
-      'Schoolwork': 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-700/50',
-      'Business Learning': 'bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-700/50',
+      'Programming': `bg-blue-${baseOpacity}0 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700/50`,
+      'Mechatronics & Tech': `bg-green-${baseOpacity}0 dark:bg-green-900/20 border-green-200 dark:border-green-700/50`,
+      'Schoolwork': `bg-orange-${baseOpacity}0 dark:bg-orange-900/20 border-orange-200 dark:border-orange-700/50`,
+      'Business Learning': `bg-pink-${baseOpacity}0 dark:bg-pink-900/20 border-pink-200 dark:border-pink-700/50`,
     };
-    return colors[category as keyof typeof colors] || 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700/50';
+    return colors[category as keyof typeof colors] || `bg-violet-${baseOpacity}0 dark:bg-violet-900/20 border-violet-200 dark:border-violet-700/50`;
   };
 
   const toggleDayExpansion = (day: string) => {
@@ -123,49 +129,47 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
 
   const TaskItem = ({ task }: { task: Task }) => (
     <div
-      className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 hover:shadow-md ${
+      className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 hover:shadow-md cursor-pointer ${
         task.completed 
           ? 'opacity-60' 
-          : ''
-      } ${getCategoryBgColor(task.category)} ${
-        deletingTasks[task.id] ? 'animate-pulse' : ''
+          : 'hover:scale-[1.02]'
+      } ${getCategoryBgColor(task.category, task.completed)} ${
+        deletingTasks[task.id] || completingTasks[task.id] ? 'animate-pulse' : ''
       }`}
       style={{
         borderLeft: `4px solid ${getCategoryColor(task.category)}`
       }}
+      onClick={() => !deletingTasks[task.id] && !completingTasks[task.id] && toggleTask(task.id, task.completed)}
     >
-      <Checkbox
-        checked={task.completed}
-        onCheckedChange={() => toggleTask(task.id, task.completed)}
-        className="flex-shrink-0"
-        disabled={deletingTasks[task.id]}
-      />
       <div
-        className="w-3 h-3 rounded-full flex-shrink-0"
+        className="w-3 h-3 rounded-full flex-shrink-0 transition-all duration-200"
         style={{ backgroundColor: getCategoryColor(task.category) }}
       />
       <div className="flex-1 min-w-0">
-        <p className={`font-medium text-sm transition-all duration-200 ${
+        <p className={`font-medium text-sm transition-all duration-300 ${
           task.completed 
             ? 'line-through text-gray-500 dark:text-gray-400' 
-            : 'text-gray-800 dark:text-gray-200'
+            : 'text-gray-800 dark:text-violet-300'
         }`}>
           {task.name}
         </p>
-        <span className="text-xs text-gray-600 dark:text-gray-400">
+        <span className="text-xs text-gray-600 dark:text-violet-400">
           {task.category}
         </span>
       </div>
       {task.completed && (
         <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-          <span className="text-white text-xs">✓</span>
+          <Check className="w-3 h-3 text-white" />
         </div>
       )}
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => deleteTask(task.id, task.name)}
-        disabled={deletingTasks[task.id]}
+        onClick={(e) => {
+          e.stopPropagation();
+          deleteTask(task.id, task.name);
+        }}
+        disabled={deletingTasks[task.id] || completingTasks[task.id]}
         className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex-shrink-0 transition-colors duration-200"
       >
         <Trash2 className="w-4 h-4" />
@@ -194,7 +198,7 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
               <CollapsibleTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="w-full justify-between p-2 h-auto text-sm hover:bg-violet-50 dark:hover:bg-violet-800/30 text-violet-700 dark:text-violet-300"
+                  className="w-full justify-between p-3 h-auto text-sm hover:bg-violet-50 dark:hover:bg-violet-800/30 text-violet-700 dark:text-violet-300 transition-all duration-200"
                   aria-expanded={isExpanded}
                 >
                   <span className="flex items-center gap-2">
@@ -202,7 +206,7 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
                       {dayTasks.slice(0, 3).map((task, index) => (
                         <div
                           key={task.id}
-                          className="w-4 h-4 rounded-full border-2 border-white dark:border-gray-800"
+                          className="w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 transition-transform duration-200 hover:scale-110"
                           style={{ backgroundColor: getCategoryColor(task.category) }}
                           title={task.name}
                         />
@@ -213,7 +217,7 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
                         </div>
                       )}
                     </div>
-                    <span>{dayTasks.length} Tasks</span>
+                    <span>{isExpanded ? 'Hide Tasks' : 'Show Tasks'} ({dayTasks.length})</span>
                   </span>
                   {isExpanded ? (
                     <ChevronDown className="w-4 h-4 text-violet-600 dark:text-violet-400 transition-transform duration-200" />
@@ -222,7 +226,7 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
                   )}
                 </Button>
               </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2 mt-2 transition-[height] duration-300 ease-in-out">
+              <CollapsibleContent className="space-y-2 mt-2 transition-all duration-300 ease-in-out overflow-hidden">
                 {dayTasks.map((task) => (
                   <TaskItem key={task.id} task={task} />
                 ))}

@@ -277,7 +277,20 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
   console.log('Dashboard showing main content');
 
-  // Always render something visible - this is critical for preventing blank screens
+  // Coming Soon Overlay Component
+  const ComingSoonOverlay = ({ children }: { children: React.ReactNode }) => (
+    <div className="relative">
+      {children}
+      <div className="absolute inset-0 bg-black/10 dark:bg-gray-900/30 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+        <div className="bg-white/20 dark:bg-gray-800/40 backdrop-blur-md rounded-lg border border-violet-200/50 dark:border-violet-700/50 px-6 py-4 shadow-lg">
+          <p className="text-violet-600 dark:text-violet-400 text-lg font-medium text-center">
+            Coming Soon
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
       {/* Header */}
@@ -294,9 +307,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                     Pathway Quest
                   </h1>
                   {profile && (
-                    <p className="text-sm text-purple-600 dark:text-purple-300">
+                    <p className="text-sm text-purple-600 dark:text-violet-300">
                       Welcome back, {profile.name}! 👋
-                      <span className="ml-2 bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full text-xs font-medium capitalize">
+                      <span className="ml-2 bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-violet-300 px-2 py-0.5 rounded-full text-xs font-medium capitalize">
                         {profile.plan || 'free'}
                       </span>
                     </p>
@@ -305,7 +318,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               </div>
               
               {user && (
-                <div className="hidden md:flex items-center gap-2 text-sm text-purple-600 dark:text-purple-300 bg-purple-50 dark:bg-purple-800/30 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-700">
+                <div className="hidden md:flex items-center gap-2 text-sm text-purple-600 dark:text-violet-300 bg-purple-50 dark:bg-purple-800/30 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-700">
                   <User className="w-4 h-4" />
                   {user.email}
                 </div>
@@ -321,7 +334,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={() => setShowSettings(true)}
                 variant="ghost"
                 size="sm"
-                className="text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50"
+                className="text-purple-700 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Settings</span>
@@ -330,7 +343,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={handleLogout}
                 variant="outline"
                 size="sm"
-                className="border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50"
+                className="border-purple-200 dark:border-purple-700 text-purple-700 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Logout</span>
@@ -351,7 +364,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           <Button
             onClick={() => setActiveTab('tasks')}
             variant={activeTab === 'tasks' ? 'default' : 'outline'}
-            className={activeTab === 'tasks' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+            className={activeTab === 'tasks' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
             size="sm"
           >
             Tasks & Progress
@@ -361,7 +374,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('calendar')}
                 variant={activeTab === 'calendar' ? 'default' : 'outline'}
-                className={activeTab === 'calendar' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+                className={activeTab === 'calendar' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
                 size="sm"
               >
                 Calendar
@@ -369,7 +382,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('teams')}
                 variant={activeTab === 'teams' ? 'default' : 'outline'}
-                className={activeTab === 'teams' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+                className={activeTab === 'teams' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
                 size="sm"
               >
                 Teams
@@ -377,7 +390,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('partners')}
                 variant={activeTab === 'partners' ? 'default' : 'outline'}
-                className={activeTab === 'partners' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+                className={activeTab === 'partners' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
                 size="sm"
               >
                 Partners
@@ -421,14 +434,18 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         )}
 
         {activeTab === 'teams' && profile && (
-          <TeamDashboard userPlan={profile.plan || 'free'} />
+          <ComingSoonOverlay>
+            <TeamDashboard userPlan={profile.plan || 'free'} />
+          </ComingSoonOverlay>
         )}
 
         {activeTab === 'partners' && profile && (
-          <div className="space-y-6">
-            <PartnerConnection userPlan={profile.plan || 'free'} />
-            <PartnerChat />
-          </div>
+          <ComingSoonOverlay>
+            <div className="space-y-6">
+              <PartnerConnection userPlan={profile.plan || 'free'} />
+              <PartnerChat />
+            </div>
+          </ComingSoonOverlay>
         )}
       </main>
 
