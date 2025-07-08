@@ -9,8 +9,8 @@ import NotFound from "./pages/NotFound";
 import Debug from "./pages/Debug";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
-// Auto-refresh logic
-const VERSION = import.meta.env.VITE_APP_VERSION || '1.0.0';
+// Auto-refresh version from .env
+const APP_VERSION = import.meta.env.VITE_APP_VERSION || '1.0.7';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -57,18 +57,25 @@ class ErrorBoundary extends React.Component<
 }
 
 function App() {
-  // 🔁 Auto-refresh logic
   useEffect(() => {
-    const storedVersion = localStorage.getItem('app_version');
-    if (storedVersion && storedVersion !== VERSION) {
-      localStorage.setItem('app_version', VERSION);
-      window.location.reload();
-    } else {
-      localStorage.setItem('app_version', VERSION);
+    const storedVersion = localStorage.getItem('appVersion');
+
+    if (storedVersion !== APP_VERSION) {
+      localStorage.setItem('appVersion', APP_VERSION);
+
+      // 🧼 Clear old caches
+      if ('caches' in window) {
+        caches.keys().then((names) => {
+          names.forEach(name => caches.delete(name));
+        });
+      }
+
+      // 🔁 Reload after cache cleared
+      setTimeout(() => {
+        window.location.reload(true);
+      }, 500);
     }
   }, []);
-
-  console.log('App component rendering...');
 
   return (
     <ErrorBoundary>
