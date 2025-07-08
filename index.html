@@ -1,32 +1,38 @@
-
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
+    <!-- 🔒 Prevent aggressive caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <!-- General Meta -->
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#8B5CF6" />
     <meta name="description" content="Pathway Quest - Your productivity assistant for success. Track tasks, build streaks, and collaborate with teams." />
-    
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
-    
+
     <!-- Apple PWA Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Pathway Quest" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    
+
     <title>Pathway Quest - Productivity Dashboard</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Service Worker Registration -->
+
+    <!-- 📦 Service Worker Registration -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
