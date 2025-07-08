@@ -275,10 +275,10 @@ const PartnerChat = () => {
 
   if (partners.length === 0) {
     return (
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+      <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-slate-800 dark:to-purple-900/20 border-purple-200 dark:border-purple-700 rounded-2xl">
         <CardContent className="text-center py-8">
-          <MessageCircle className="w-12 h-12 text-blue-300 mx-auto mb-3" />
-          <p className="text-gray-600">No active partnerships yet.</p>
+          <MessageCircle className="w-12 h-12 text-purple-300 mx-auto mb-3" />
+          <p className="text-gray-600 dark:text-gray-400">No active partnerships yet.</p>
           <p className="text-sm text-gray-500 mt-2">
             Accept a partnership invitation to start collaborating!
           </p>
@@ -290,9 +290,9 @@ const PartnerChat = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[600px]">
       {/* Partner List */}
-      <Card className="lg:col-span-1 bg-gradient-to-b from-blue-50 to-indigo-100 border-blue-200">
+      <Card className="lg:col-span-1 bg-gradient-to-b from-purple-50 to-indigo-100 dark:from-slate-800 dark:to-purple-900/20 border-purple-200 dark:border-purple-700 rounded-2xl">
         <CardHeader className="pb-3">
-          <CardTitle className="text-blue-700 text-sm">Partners</CardTitle>
+          <CardTitle className="text-purple-700 dark:text-purple-300 text-sm">Partners</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {partners.map((partner) => (
@@ -301,24 +301,24 @@ const PartnerChat = () => {
               onClick={() => setSelectedPartner(partner)}
               className={`p-3 rounded-lg cursor-pointer transition-colors ${
                 selectedPartner?.id === partner.id
-                  ? 'bg-blue-200 border-blue-300'
-                  : 'bg-white hover:bg-blue-50 border-blue-100'
+                  ? 'bg-purple-200 dark:bg-purple-800 border-purple-300 dark:border-purple-600'
+                  : 'bg-white dark:bg-slate-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 border-purple-100 dark:border-purple-700'
               } border`}
             >
-              <p className="font-medium text-sm text-gray-900">
+              <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
                 {partner.partner_name}
               </p>
-              <p className="text-xs text-gray-600">{partner.partner_email}</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">{partner.partner_email}</p>
             </div>
           ))}
         </CardContent>
       </Card>
 
       {/* Chat & Tasks Panel */}
-      <Card className="lg:col-span-2 bg-white border-blue-200 shadow-lg flex flex-col">
-        <CardHeader className="pb-3 border-b border-blue-100">
+      <Card className="lg:col-span-2 bg-white dark:bg-slate-800 border-purple-200 dark:border-purple-700 shadow-lg flex flex-col rounded-2xl">
+        <CardHeader className="pb-3 border-b border-purple-100 dark:border-purple-700 rounded-t-2xl">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-blue-700 text-sm">
+            <CardTitle className="text-purple-700 dark:text-purple-300 text-sm">
               {selectedPartner?.partner_name}
             </CardTitle>
             <div className="flex gap-2">
@@ -326,7 +326,7 @@ const PartnerChat = () => {
                 onClick={() => setShowTasks(false)}
                 size="sm"
                 variant={!showTasks ? 'default' : 'outline'}
-                className={!showTasks ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                className={`rounded-lg transition-all duration-200 ${!showTasks ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30'}`}
               >
                 <MessageCircle className="w-4 h-4 mr-1" />
                 Chat
@@ -335,7 +335,7 @@ const PartnerChat = () => {
                 onClick={() => setShowTasks(true)}
                 size="sm"
                 variant={showTasks ? 'default' : 'outline'}
-                className={showTasks ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                className={`rounded-lg transition-all duration-200 ${showTasks ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30'}`}
               >
                 <CheckSquare className="w-4 h-4 mr-1" />
                 Tasks ({tasks.length})
@@ -359,8 +359,8 @@ const PartnerChat = () => {
                     <div
                       className={`max-w-xs lg:max-w-md px-3 py-2 rounded-lg ${
                         message.sender_id === currentUser?.id
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-900'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-gray-100'
                       }`}
                     >
                       <p className="text-sm">{message.content}</p>
@@ -374,19 +374,19 @@ const PartnerChat = () => {
               </div>
 
               {/* Message Input */}
-              <div className="p-4 border-t border-blue-100">
+              <div className="p-4 border-t border-purple-100 dark:border-purple-700">
                 <div className="flex gap-2">
                   <Input
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type your message..."
                     onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    className="flex-1"
+                    className="flex-1 border-purple-200 dark:border-purple-700 dark:bg-slate-700 dark:text-white rounded-xl"
                   />
                   <Button
                     onClick={sendMessage}
                     disabled={!newMessage.trim()}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-purple-600 hover:bg-purple-700 rounded-xl"
                   >
                     <Send className="w-4 h-4" />
                   </Button>
@@ -401,19 +401,17 @@ const PartnerChat = () => {
                   {tasks.map((task) => (
                     <div
                       key={task.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
+                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700 rounded-xl border border-purple-100 dark:border-purple-700"
                     >
                       <div className="flex items-center gap-3">
                         <input
                           type="checkbox"
                           checked={task.completed}
                           onChange={() => toggleTask(task.id, task.completed)}
-                          className="w-4 h-4 text-blue-600"
+                          className="w-4 h-4 text-purple-600 rounded"
                         />
                         <span
-                          className={`${
-                            task.completed ? 'line-through text-gray-500' : 'text-gray-900'
-                          }`}
+                          className={`${task.completed ? 'line-through text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}
                         >
                           {task.title}
                         </span>
@@ -422,7 +420,7 @@ const PartnerChat = () => {
                         onClick={() => deleteTask(task.id)}
                         size="sm"
                         variant="ghost"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -432,19 +430,19 @@ const PartnerChat = () => {
               </div>
 
               {/* Task Input */}
-              <div className="p-4 border-t border-blue-100">
+              <div className="p-4 border-t border-purple-100 dark:border-purple-700">
                 <div className="flex gap-2">
                   <Input
                     value={newTask}
                     onChange={(e) => setNewTask(e.target.value)}
                     placeholder="Add a shared task..."
                     onKeyPress={(e) => e.key === 'Enter' && createTask()}
-                    className="flex-1"
+                    className="flex-1 border-purple-200 dark:border-purple-700 dark:bg-slate-700 dark:text-white rounded-xl"
                   />
                   <Button
                     onClick={createTask}
                     disabled={!newTask.trim()}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-purple-600 hover:bg-purple-700 rounded-xl"
                   >
                     <Plus className="w-4 h-4" />
                   </Button>

@@ -180,10 +180,10 @@ const EnhancedCalendarView = ({ tasks = [], userPlan }: EnhancedCalendarViewProp
 
   if (userPlan === 'free') {
     return (
-      <Card className="w-full max-w-4xl mx-auto bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+      <Card className="w-full max-w-4xl mx-auto bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-slate-800 dark:to-purple-900/20 border-purple-200 dark:border-purple-700 rounded-2xl">
         <CardHeader className="text-center">
-          <CalendarDays className="w-16 h-16 text-blue-300 mx-auto mb-4" />
-          <CardTitle className="text-2xl text-gray-600">Enhanced Calendar</CardTitle>
+          <CalendarDays className="w-16 h-16 text-purple-300 mx-auto mb-4" />
+          <CardTitle className="text-2xl text-gray-600 dark:text-gray-300">Enhanced Calendar</CardTitle>
           <p className="text-gray-500">
             Upgrade to Premium to access the advanced calendar with events and task management
           </p>
@@ -195,9 +195,9 @@ const EnhancedCalendarView = ({ tasks = [], userPlan }: EnhancedCalendarViewProp
   return (
     <div className="w-full space-y-6">
       {/* Main Calendar */}
-      <Card className="w-full bg-gradient-to-br from-white to-blue-50 border-blue-200 shadow-xl">
+      <Card className="w-full bg-gradient-to-br from-white to-purple-50 dark:from-slate-800 dark:to-purple-900/20 border-purple-200 dark:border-purple-700 shadow-xl rounded-2xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl text-blue-700">
+          <CardTitle className="flex items-center gap-2 text-xl text-purple-700 dark:text-purple-300">
             <CalendarDays className="w-6 h-6" />
             Enhanced Calendar
           </CardTitle>
@@ -215,21 +215,22 @@ const EnhancedCalendarView = ({ tasks = [], userPlan }: EnhancedCalendarViewProp
               months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full",
               month: "space-y-4 w-full",
               caption: "flex justify-center pt-1 relative items-center text-lg font-semibold text-blue-700",
+              caption: "flex justify-center pt-1 relative items-center text-lg font-semibold text-purple-700 dark:text-purple-300",
               table: "w-full border-collapse space-y-2",
               head_row: "flex w-full",
-              head_cell: "text-blue-600 rounded-md flex-1 font-medium text-sm text-center p-3",
+              head_cell: "text-purple-600 dark:text-purple-400 rounded-md flex-1 font-medium text-sm text-center p-3",
               row: "flex w-full mt-2",
-              cell: "flex-1 h-16 text-center text-sm p-1 relative hover:bg-blue-50 rounded-lg transition-colors cursor-pointer",
-              day: "h-full w-full p-0 font-normal hover:bg-blue-100 hover:text-blue-700 rounded-lg transition-colors flex flex-col items-center justify-center",
-              day_selected: "bg-blue-600 text-white hover:bg-blue-700",
-              day_today: "bg-blue-100 text-blue-700 font-semibold"
+              cell: "flex-1 h-16 text-center text-sm p-1 relative hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-colors cursor-pointer",
+              day: "h-full w-full p-0 font-normal hover:bg-purple-100 dark:hover:bg-purple-800 hover:text-purple-700 dark:hover:text-purple-300 rounded-lg transition-colors flex flex-col items-center justify-center",
+              day_selected: "bg-purple-600 text-white hover:bg-purple-700",
+              day_today: "bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-300 font-semibold"
             }}
           />
 
           {/* Event Creation Form */}
           {showEventForm && (
-            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200">
-              <h3 className="text-lg font-semibold text-blue-700 mb-4">
+            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl border-2 border-purple-200 dark:border-purple-700">
+              <h3 className="text-lg font-semibold text-purple-700 dark:text-purple-300 mb-4">
                 Create Event for {format(selectedDate, 'MMMM dd, yyyy')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -237,26 +238,26 @@ const EnhancedCalendarView = ({ tasks = [], userPlan }: EnhancedCalendarViewProp
                   value={newEvent.title}
                   onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                   placeholder="Event title"
-                  className="bg-white border-blue-200 focus:border-blue-400"
+                  className="bg-white dark:bg-slate-700 border-purple-200 dark:border-purple-700 focus:border-purple-400 dark:text-white rounded-xl"
                 />
                 <Input
                   type="time"
                   value={newEvent.time}
                   onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
-                  className="bg-white border-blue-200 focus:border-blue-400"
+                  className="bg-white dark:bg-slate-700 border-purple-200 dark:border-purple-700 focus:border-purple-400 dark:text-white rounded-xl"
                 />
                 <Input
                   value={newEvent.venue}
                   onChange={(e) => setNewEvent({ ...newEvent, venue: e.target.value })}
                   placeholder="Venue (optional)"
-                  className="bg-white border-blue-200 focus:border-blue-400"
+                  className="bg-white dark:bg-slate-700 border-purple-200 dark:border-purple-700 focus:border-purple-400 dark:text-white rounded-xl"
                 />
               </div>
               <div className="flex gap-2 mt-4">
                 <Button
                   onClick={createEvent}
                   disabled={!newEvent.title.trim()}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-purple-600 hover:bg-purple-700 rounded-xl"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Create Event
@@ -264,7 +265,7 @@ const EnhancedCalendarView = ({ tasks = [], userPlan }: EnhancedCalendarViewProp
                 <Button
                   onClick={() => setShowEventForm(false)}
                   variant="outline"
-                  className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                  className="border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl"
                 >
                   Cancel
                 </Button>
@@ -277,31 +278,31 @@ const EnhancedCalendarView = ({ tasks = [], userPlan }: EnhancedCalendarViewProp
       {/* Day Details Modal */}
       {showDayModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md bg-white shadow-2xl">
-            <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50">
-              <CardTitle className="text-blue-700">
+          <Card className="w-full max-w-md bg-white dark:bg-slate-800 shadow-2xl rounded-2xl">
+            <CardHeader className="pb-3 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-t-2xl">
+              <CardTitle className="text-purple-700 dark:text-purple-300">
                 {format(selectedDate, 'MMMM dd, yyyy')}
               </CardTitle>
-              <p className="text-sm text-blue-600">
+              <p className="text-sm text-purple-600 dark:text-purple-400">
                 {getTotalItemsForDate(selectedDate)} items scheduled
               </p>
             </CardHeader>
             <CardContent className="space-y-4 max-h-96 overflow-y-auto">
               {/* Events */}
               {getEventsForDate(selectedDate).map((event) => (
-                <div key={event.id} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div key={event.id} className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-xl border border-purple-200 dark:border-purple-700">
                   <div className="flex items-start gap-2">
-                    <CalendarDays className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <CalendarDays className="w-4 h-4 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
                     <div className="flex-1">
-                      <p className="font-medium text-blue-900">{event.title}</p>
+                      <p className="font-medium text-purple-900 dark:text-purple-100">{event.title}</p>
                       {event.time && (
-                        <p className="text-sm text-blue-600 flex items-center gap-1">
+                        <p className="text-sm text-purple-600 dark:text-purple-400 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {event.time}
                         </p>
                       )}
                       {event.venue && (
-                        <p className="text-sm text-blue-600 flex items-center gap-1">
+                        <p className="text-sm text-purple-600 dark:text-purple-400 flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
                           {event.venue}
                         </p>
@@ -313,8 +314,8 @@ const EnhancedCalendarView = ({ tasks = [], userPlan }: EnhancedCalendarViewProp
 
               {/* Tasks by Category */}
               {Object.entries(getTasksByCategory(selectedDate)).map(([category, count]) => (
-                <div key={category} className="p-3 bg-gray-50 rounded-lg border">
-                  <p className="font-medium text-gray-900">{category}</p>
+                <div key={category} className="p-3 bg-gray-50 dark:bg-slate-700 rounded-xl border border-purple-100 dark:border-purple-700">
+                  <p className="font-medium text-gray-900 dark:text-gray-100">{category}</p>
                   <p className="text-sm text-gray-600">{count} task{count !== 1 ? 's' : ''}</p>
                 </div>
               ))}
@@ -325,7 +326,7 @@ const EnhancedCalendarView = ({ tasks = [], userPlan }: EnhancedCalendarViewProp
                   setShowDayModal(false);
                   setShowEventForm(true);
                 }}
-                className="bg-blue-600 hover:bg-blue-700 flex-1"
+                className="bg-purple-600 hover:bg-purple-700 flex-1 rounded-xl"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Event
@@ -333,7 +334,7 @@ const EnhancedCalendarView = ({ tasks = [], userPlan }: EnhancedCalendarViewProp
               <Button
                 onClick={() => setShowDayModal(false)}
                 variant="outline"
-                className="border-blue-200 text-blue-600"
+                className="border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 rounded-xl"
               >
                 Close
               </Button>

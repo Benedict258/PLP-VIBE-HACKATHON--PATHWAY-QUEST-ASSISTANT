@@ -245,7 +245,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   // Add debugging render
   console.log('Dashboard render state:', { loading, showPlanSelection, showWorkspaceSetup, profile, user });
 
+  // Add early returns with better debugging
   if (loading) {
+    console.log('Dashboard showing loading state');
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
         <div className="text-center">
@@ -257,12 +259,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   }
 
   if (showWorkspaceSetup) {
+    console.log('Dashboard showing workspace setup');
     return (
       <WorkspaceSetup onSetupComplete={handleWorkspaceSetup} />
     );
   }
 
   if (showPlanSelection) {
+    console.log('Dashboard showing plan selection');
     return (
       <PlanSelection 
         currentPlan={profile?.plan || 'free'} 
@@ -271,11 +275,12 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     );
   }
 
-  // Always render something visible - this is critical for preventing blank screens
+  console.log('Dashboard showing main content');
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
       {/* Header */}
-      <header className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-b border-purple-200 dark:border-purple-700 shadow-lg sticky top-0 z-40 transition-colors duration-300 w-full">
+      <header className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-b border-purple-200 dark:border-purple-700 shadow-lg sticky top-0 z-40 transition-colors duration-300 w-full">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
@@ -288,9 +293,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                     Pathway Quest
                   </h1>
                   {profile && (
-                    <p className="text-sm text-purple-600 dark:text-purple-300">
+                    <p className="text-sm text-purple-600 dark:text-violet-300">
                       Welcome back, {profile.name}! 👋
-                      <span className="ml-2 bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full text-xs font-medium capitalize">
+                      <span className="ml-2 bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-violet-300 px-2 py-0.5 rounded-full text-xs font-medium capitalize">
                         {profile.plan || 'free'}
                       </span>
                     </p>
@@ -299,7 +304,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               </div>
               
               {user && (
-                <div className="hidden md:flex items-center gap-2 text-sm text-purple-600 dark:text-purple-300 bg-purple-50 dark:bg-purple-800/30 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-700">
+                <div className="hidden md:flex items-center gap-2 text-sm text-purple-600 dark:text-violet-300 bg-purple-50 dark:bg-purple-800/30 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-700">
                   <User className="w-4 h-4" />
                   {user.email}
                 </div>
@@ -315,7 +320,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={() => setShowSettings(true)}
                 variant="ghost"
                 size="sm"
-                className="text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50"
+                className="text-purple-700 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50 transition-all duration-200 rounded-xl"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Settings</span>
@@ -324,7 +329,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={handleLogout}
                 variant="outline"
                 size="sm"
-                className="border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50"
+                className="border-purple-200 dark:border-purple-700 text-purple-700 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50 transition-all duration-200 rounded-xl"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Logout</span>
@@ -341,11 +346,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
       {/* Navigation Tabs */}
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="flex flex-wrap gap-2 mb-6 overflow-x-auto">
+        <div className="flex flex-wrap gap-3 mb-6 overflow-x-auto">
           <Button
             onClick={() => setActiveTab('tasks')}
             variant={activeTab === 'tasks' ? 'default' : 'outline'}
-            className={activeTab === 'tasks' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+            className={`transition-all duration-200 rounded-xl font-medium ${activeTab === 'tasks' ? 
+              'bg-purple-600 hover:bg-purple-700 shadow-lg' : 
+              'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'
+            }`}
             size="sm"
           >
             Tasks & Progress
@@ -355,7 +363,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('calendar')}
                 variant={activeTab === 'calendar' ? 'default' : 'outline'}
-                className={activeTab === 'calendar' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+                className={`transition-all duration-200 rounded-xl font-medium ${activeTab === 'calendar' ? 
+                  'bg-purple-600 hover:bg-purple-700 shadow-lg' : 
+                  'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'
+                }`}
                 size="sm"
               >
                 Calendar
@@ -363,7 +374,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('teams')}
                 variant={activeTab === 'teams' ? 'default' : 'outline'}
-                className={activeTab === 'teams' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+                className={`transition-all duration-200 rounded-xl font-medium ${activeTab === 'teams' ? 
+                  'bg-purple-600 hover:bg-purple-700 shadow-lg' : 
+                  'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'
+                }`}
                 size="sm"
               >
                 Teams
@@ -371,7 +385,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('partners')}
                 variant={activeTab === 'partners' ? 'default' : 'outline'}
-                className={activeTab === 'partners' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+                className={`transition-all duration-200 rounded-xl font-medium ${activeTab === 'partners' ? 
+                  'bg-purple-600 hover:bg-purple-700 shadow-lg' : 
+                  'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'
+                }`}
                 size="sm"
               >
                 Partners

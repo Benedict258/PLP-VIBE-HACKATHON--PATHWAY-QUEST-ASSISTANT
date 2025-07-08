@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ThemeProvider } from '@/contexts/ThemeContext';
 import AuthForm from '@/components/AuthForm';
 import Dashboard from '@/components/Dashboard';
 
@@ -13,8 +12,8 @@ const Index = () => {
     console.log('Index component mounting...');
     
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session:', session);
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('Initial session:', session, 'Error:', error);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -54,16 +53,15 @@ const Index = () => {
     );
   }
 
+  // Add fallback for debugging
   return (
-    <ThemeProvider>
-      <div className="w-full min-h-screen transition-colors duration-300">
-        {user ? (
-          <Dashboard onLogout={handleLogout} />
-        ) : (
-          <AuthForm onAuthSuccess={handleAuthSuccess} />
-        )}
-      </div>
-    </ThemeProvider>
+    <div className="w-full min-h-screen transition-colors duration-300">
+      {user ? (
+        <Dashboard onLogout={handleLogout} />
+      ) : (
+        <AuthForm onAuthSuccess={handleAuthSuccess} />
+      )}
+    </div>
   );
 };
 
