@@ -10,7 +10,7 @@ import Debug from "./pages/Debug";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 // Auto-refresh version from .env
-const APP_VERSION = import.meta.env.VITE_APP_VERSION || '1.0.7';
+const APP_VERSION = import.meta.env.VITE_APP_VERSION || '1.0.0';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
