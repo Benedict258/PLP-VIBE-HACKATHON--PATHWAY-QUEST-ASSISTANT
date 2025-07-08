@@ -112,12 +112,12 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
   const getCategoryBgColor = (category: string, completed: boolean = false) => {
     const baseOpacity = completed ? '5' : '10';
     const colors = {
-      'Programming': `bg-blue-${baseOpacity}0 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700/50`,
-      'Mechatronics & Tech': `bg-green-${baseOpacity}0 dark:bg-green-900/20 border-green-200 dark:border-green-700/50`,
-      'Schoolwork': `bg-orange-${baseOpacity}0 dark:bg-orange-900/20 border-orange-200 dark:border-orange-700/50`,
-      'Business Learning': `bg-pink-${baseOpacity}0 dark:bg-pink-900/20 border-pink-200 dark:border-pink-700/50`,
+      'Programming': `bg-blue-${baseOpacity}0 dark:bg-blue-500/10 border-blue-200/30 dark:border-blue-400/20`,
+      'Mechatronics & Tech': `bg-green-${baseOpacity}0 dark:bg-green-500/10 border-green-200/30 dark:border-green-400/20`,
+      'Schoolwork': `bg-orange-${baseOpacity}0 dark:bg-orange-500/10 border-orange-200/30 dark:border-orange-400/20`,
+      'Business Learning': `bg-pink-${baseOpacity}0 dark:bg-pink-500/10 border-pink-200/30 dark:border-pink-400/20`,
     };
-    return colors[category as keyof typeof colors] || `bg-violet-${baseOpacity}0 dark:bg-violet-900/20 border-violet-200 dark:border-violet-700/50`;
+    return colors[category as keyof typeof colors] || `bg-violet-${baseOpacity}0 dark:bg-violet-500/10 border-violet-200/30 dark:border-violet-400/20`;
   };
 
   const toggleDayExpansion = (day: string) => {
@@ -129,37 +129,37 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
 
   const TaskItem = ({ task }: { task: Task }) => (
     <div
-      className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 hover:shadow-md cursor-pointer ${
+      className={`group flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 hover:scale-[1.02] hover:shadow-lg cursor-pointer ${
         task.completed 
           ? 'opacity-60' 
-          : 'hover:scale-[1.02]'
+          : 'hover:shadow-md'
       } ${getCategoryBgColor(task.category, task.completed)} ${
         deletingTasks[task.id] || completingTasks[task.id] ? 'animate-pulse' : ''
-      }`}
+      } backdrop-blur-sm`}
       style={{
         borderLeft: `4px solid ${getCategoryColor(task.category)}`
       }}
       onClick={() => !deletingTasks[task.id] && !completingTasks[task.id] && toggleTask(task.id, task.completed)}
     >
       <div
-        className="w-3 h-3 rounded-full flex-shrink-0 transition-all duration-200"
+        className="w-3 h-3 rounded-full flex-shrink-0 transition-all duration-200 shadow-sm"
         style={{ backgroundColor: getCategoryColor(task.category) }}
       />
       <div className="flex-1 min-w-0">
-        <p className={`font-medium text-sm transition-all duration-300 ${
+        <p className={`font-medium text-base leading-relaxed transition-all duration-300 ${
           task.completed 
-            ? 'line-through text-gray-500 dark:text-gray-400' 
-            : 'text-gray-800 dark:text-violet-300'
+            ? 'line-through text-slate-500 dark:text-slate-400' 
+            : 'text-slate-800 dark:text-slate-100'
         }`}>
           {task.name}
         </p>
-        <span className="text-xs text-gray-600 dark:text-violet-400">
+        <span className="text-sm text-slate-600 dark:text-violet-300 font-medium">
           {task.category}
         </span>
       </div>
       {task.completed && (
-        <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-          <Check className="w-3 h-3 text-white" />
+        <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 shadow-md">
+          <Check className="w-4 h-4 text-white" />
         </div>
       )}
       <Button
@@ -170,7 +170,7 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
           deleteTask(task.id, task.name);
         }}
         disabled={deletingTasks[task.id] || completingTasks[task.id]}
-        className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex-shrink-0 transition-colors duration-200"
+        className="h-8 w-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 flex-shrink-0 transition-all duration-200 rounded-lg hover:scale-105"
       >
         <Trash2 className="w-4 h-4" />
       </Button>
@@ -184,49 +184,47 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
     
     return (
       <WeeklyScheduleHover key={day} day={day} tasks={dayTasks}>
-        <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-4 border border-violet-200 dark:border-violet-700/50 shadow-sm hover:shadow-md transition-all duration-200">
-          <h3 className="font-semibold text-violet-800 dark:text-violet-300 mb-3 text-center">
+        <div className="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 border border-violet-200/50 dark:border-violet-400/20 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm hover:scale-[1.02]">
+          <h3 className="font-semibold text-lg text-violet-800 dark:text-violet-300 mb-4 text-center">
             {day}
           </h3>
           
           {dayTasks.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4">
-              No tasks scheduled
-            </p>
+            <div className="text-center py-6">
+              <p className="text-slate-500 dark:text-slate-400 text-base leading-relaxed">
+                No tasks scheduled
+              </p>
+            </div>
           ) : hasMultipleTasks ? (
             <Collapsible open={isExpanded} onOpenChange={() => toggleDayExpansion(day)}>
               <CollapsibleTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="w-full justify-between p-3 h-auto text-sm hover:bg-violet-50 dark:hover:bg-violet-800/30 text-violet-700 dark:text-violet-300 transition-all duration-200"
+                  className="w-full justify-between p-3 h-auto text-base hover:bg-violet-50/80 dark:hover:bg-violet-800/30 text-violet-700 dark:text-violet-300 transition-all duration-200 rounded-xl font-medium"
                   aria-expanded={isExpanded}
                 >
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-3">
                     <div className="flex -space-x-1">
                       {dayTasks.slice(0, 3).map((task, index) => (
                         <div
                           key={task.id}
-                          className="w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 transition-transform duration-200 hover:scale-110"
+                          className="w-5 h-5 rounded-full border-2 border-white dark:border-slate-800 transition-all duration-200 hover:scale-110 shadow-sm"
                           style={{ backgroundColor: getCategoryColor(task.category) }}
                           title={task.name}
                         />
                       ))}
                       {dayTasks.length > 3 && (
-                        <div className="w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                          <span className="text-xs text-gray-600 dark:text-gray-300">+</span>
+                        <div className="w-5 h-5 rounded-full border-2 border-white dark:border-slate-800 bg-slate-300 dark:bg-slate-600 flex items-center justify-center shadow-sm">
+                          <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">+</span>
                         </div>
                       )}
                     </div>
-                    <span>{isExpanded ? 'Hide Tasks' : 'Show Tasks'} ({dayTasks.length})</span>
+                    <span className="leading-relaxed">{isExpanded ? 'Hide Tasks' : 'Show Tasks'} ({dayTasks.length})</span>
                   </span>
-                  {isExpanded ? (
-                    <ChevronDown className="w-4 h-4 text-violet-600 dark:text-violet-400 transition-transform duration-200" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-violet-600 dark:text-violet-400 transition-transform duration-200" />
-                  )}
+                  <ChevronDown className={`w-5 h-5 text-violet-600 dark:text-violet-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                 </Button>
               </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2 mt-2 transition-all duration-300 ease-in-out overflow-hidden">
+              <CollapsibleContent className="space-y-3 mt-3 transition-all duration-300 ease-in-out overflow-hidden">
                 {dayTasks.map((task) => (
                   <TaskItem key={task.id} task={task} />
                 ))}
@@ -241,15 +239,15 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
   };
 
   return (
-    <Card className="shadow-lg border-violet-200 dark:border-violet-700/50 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+    <Card className="shadow-xl border-violet-200/50 dark:border-violet-400/20 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl">
       <CardHeader>
-        <CardTitle className="text-2xl text-violet-800 dark:text-violet-300 flex items-center gap-2">
-          <Calendar className="w-6 h-6" />
+        <CardTitle className="text-2xl text-violet-800 dark:text-violet-300 flex items-center gap-3 font-semibold">
+          <Calendar className="w-7 h-7" />
           Weekly Schedule
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <CardContent className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {days.map((day) => (
             <DayCard key={day} day={day} />
           ))}

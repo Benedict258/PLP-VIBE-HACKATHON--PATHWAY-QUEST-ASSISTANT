@@ -7,34 +7,34 @@
 /* ... keep existing code (CSS variables and base styles) */
 
 @layer components {
-  /* Task animation styles */
+  /* Enhanced task animation styles with techy feel */
   .task-item {
     @apply transition-all duration-300 ease-in-out;
   }
   
   .task-item:hover {
-    @apply transform scale-[1.02] shadow-lg;
+    @apply transform scale-[1.02] shadow-xl;
   }
   
   .task-completed {
-    @apply opacity-60 transition-opacity duration-300;
+    @apply opacity-60 transition-all duration-300;
   }
   
-  /* Enhanced collapsible animations */
+  /* Enhanced collapsible animations with smooth transitions */
   .collapsible-content {
     @apply transition-[height,opacity] duration-300 ease-in-out;
   }
   
-  /* Category dot animations */
+  /* Category dot animations with glow effect */
   .category-dot {
-    @apply transition-all duration-200 ease-in-out;
+    @apply transition-all duration-200 ease-in-out shadow-sm;
   }
   
   .category-dot:hover {
-    @apply transform scale-110 shadow-sm;
+    @apply transform scale-110 shadow-lg;
   }
   
-  /* Task deletion animation */
+  /* Task deletion animation with smooth exit */
   .task-deleting {
     @apply transition-all duration-300 ease-out transform scale-95 opacity-0;
   }
@@ -45,10 +45,10 @@
   }
   
   .interactive-element:hover {
-    @apply transform translateY(-1px) shadow-md;
+    @apply transform translateY(-1px) shadow-lg;
   }
 
-  /* Enhanced dropdown animations */
+  /* Enhanced dropdown animations with glassmorphism */
   .dropdown-enter {
     @apply transition-[height,opacity] duration-300 ease-out;
     height: 0;
@@ -71,7 +71,7 @@
     opacity: 0;
   }
 
-  /* Task completion visual states */
+  /* Task completion visual states with enhanced feedback */
   .task-complete-animation {
     @apply transition-all duration-500 ease-out;
   }
@@ -80,62 +80,62 @@
     @apply opacity-60 scale-95;
   }
 
-  /* Improved button hover states */
+  /* Improved button hover states with scale and glow */
   .task-action-button {
-    @apply transition-all duration-200 ease-in-out transform hover:scale-105;
+    @apply transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg;
   }
 
-  /* Weekly Schedule specific animations */
+  /* Weekly Schedule specific animations with modern feel */
   .weekly-schedule-dropdown {
     @apply transition-all duration-300 ease-in-out;
   }
 
   .weekly-schedule-dropdown[data-state="open"] {
-    @apply animate-in slide-in-from-top-2 fade-in-0;
+    @apply animate-in slide-in-from-top-2 fade-in-0 duration-300;
   }
 
   .weekly-schedule-dropdown[data-state="closed"] {
-    @apply animate-out slide-out-to-top-2 fade-out-0;
+    @apply animate-out slide-out-to-top-2 fade-out-0 duration-200;
   }
 
-  /* Coming Soon overlay styles */
-  .coming-soon-overlay {
-    @apply absolute inset-0 bg-black/10 dark:bg-gray-900/30 backdrop-blur-sm rounded-lg flex items-center justify-center z-10 transition-all duration-300;
+  /* Glassmorphism effects for modern UI */
+  .glass-effect {
+    @apply bg-white/10 dark:bg-slate-800/30 backdrop-blur-md border border-white/20 dark:border-slate-700/50;
   }
 
-  .coming-soon-card {
-    @apply bg-white/20 dark:bg-gray-800/40 backdrop-blur-md rounded-lg border border-violet-200/50 dark:border-violet-700/50 px-6 py-4 shadow-lg;
+  .glass-card {
+    @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/30 dark:border-slate-700/30 shadow-xl;
   }
 }
 
-/* Dark mode enhancements for better visibility */
+/* Enhanced dark mode with better contrast and violet theme */
 .dark {
   color-scheme: dark;
 }
 
 .dark .task-item {
-  @apply bg-gray-800/50 border-gray-700/50;
+  @apply bg-slate-800/60 border-slate-700/50;
 }
 
 .dark .task-item:hover {
-  @apply bg-gray-700/70 border-gray-600/70;
+  @apply bg-slate-700/80 border-slate-600/70 shadow-xl;
 }
 
-/* Enhanced dark mode text visibility */
+/* Enhanced dark mode text visibility with violet accents */
 .dark h1,
 .dark h2,
 .dark h3,
 .dark h4,
 .dark h5,
 .dark h6 {
-  @apply text-gray-100;
+  @apply text-slate-100;
 }
 
 .dark p {
-  @apply text-gray-200;
+  @apply text-slate-200;
 }
 
-/* Improved violet/indigo color scheme for dark mode */
+/* Improved violet/indigo color scheme for dark mode consistency */
 .dark .text-violet-800 {
   @apply text-violet-300;
 }
@@ -156,18 +156,18 @@
   @apply text-violet-300;
 }
 
-/* Form field improvements for dark mode */
+/* Enhanced form field improvements for dark mode */
 .dark input,
 .dark textarea,
 .dark select {
-  @apply text-violet-300 placeholder-violet-400;
+  @apply text-violet-300 placeholder-violet-400 bg-slate-800/50 border-slate-600/50;
 }
 
 .dark label {
   @apply text-violet-300;
 }
 
-/* Mobile touch targets */
+/* Mobile touch targets with improved accessibility */
 @media (max-width: 768px) {
   .task-item {
     @apply min-h-[48px] touch-manipulation;
@@ -177,18 +177,13 @@
     @apply min-h-[44px] min-w-[44px] touch-manipulation;
   }
 
-  /* Mobile-specific dropdown behavior */
+  /* Mobile-specific dropdown behavior with better spacing */
   .collapsible-trigger {
     @apply text-base p-3;
   }
-
-  /* Coming soon overlay mobile adjustments */
-  .coming-soon-card {
-    @apply px-4 py-3 text-base;
-  }
 }
 
-/* Accessibility improvements */
+/* Accessibility improvements with reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .task-item,
   .collapsible-content,
@@ -202,18 +197,18 @@
   }
 }
 
-/* Focus styles for keyboard navigation */
+/* Enhanced focus styles for keyboard navigation */
 .task-item:focus-within {
-  @apply ring-2 ring-violet-500 ring-offset-2 dark:ring-offset-gray-800;
+  @apply ring-2 ring-violet-500 ring-offset-2 dark:ring-offset-slate-800 shadow-lg;
 }
 
 button:focus-visible {
-  @apply ring-2 ring-violet-500 ring-offset-2 dark:ring-offset-gray-800;
+  @apply ring-2 ring-violet-500 ring-offset-2 dark:ring-offset-slate-800;
 }
 
-/* Enhanced hover card styles */
+/* Enhanced hover card styles with glassmorphism */
 .hover-card {
-  @apply absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-violet-200 dark:border-violet-700 rounded-lg shadow-lg p-4 min-w-[280px] max-w-[320px] z-50 transition-all duration-200 ease-out transform;
+  @apply absolute top-full left-0 mt-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-violet-200/50 dark:border-violet-400/30 rounded-xl shadow-xl p-4 min-w-[280px] max-w-[320px] z-50 transition-all duration-200 ease-out transform;
 }
 
 @media (max-width: 768px) {
@@ -222,7 +217,7 @@ button:focus-visible {
   }
 }
 
-/* Task dropdown specific styles */
+/* Task dropdown specific styles with enhanced animations */
 .task-dropdown-content {
   @apply transition-all duration-300 ease-in-out;
 }
@@ -233,4 +228,13 @@ button:focus-visible {
 
 .task-dropdown-content[data-state="closed"] {
   @apply animate-out slide-out-to-top-1 fade-out-0 duration-200;
+}
+
+/* Enhanced card styling with modern shadows and blur effects */
+.modern-card {
+  @apply bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-white/30 dark:border-slate-700/30 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300;
+}
+
+.modern-button {
+  @apply bg-white/20 dark:bg-slate-800/40 backdrop-blur-md border border-white/30 dark:border-slate-700/30 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg;
 }

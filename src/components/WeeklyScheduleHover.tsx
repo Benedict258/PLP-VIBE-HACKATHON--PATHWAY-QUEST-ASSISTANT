@@ -45,37 +45,37 @@ const WeeklyScheduleHover = ({ day, tasks, children }: WeeklyScheduleHoverProps)
       
       {showHover && tasks.length > 0 && (
         <div className="hover-card">
-          <h4 className="font-semibold text-sm mb-3 text-gray-900 dark:text-gray-100">
+          <h4 className="font-semibold text-base mb-3 text-slate-900 dark:text-slate-100 leading-relaxed">
             {day} Tasks
           </h4>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
+          <div className="space-y-3 max-h-64 overflow-y-auto">
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className="flex items-center gap-2 p-2 rounded-lg"
+                className="flex items-center gap-3 p-3 rounded-xl transition-all duration-200 hover:scale-[1.02] cursor-pointer"
                 style={{
                   backgroundColor: `${getCategoryColor(task.category)}15`,
                   borderLeft: `3px solid ${getCategoryColor(task.category)}`
                 }}
               >
                 <div
-                  className="w-3 h-3 rounded-full flex-shrink-0"
+                  className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
                   style={{ backgroundColor: getCategoryColor(task.category) }}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium ${
+                  <p className={`text-base font-medium leading-relaxed ${
                     task.completed 
-                      ? 'line-through text-gray-500 dark:text-gray-500' 
-                      : 'text-gray-900 dark:text-gray-100'
+                      ? 'line-through text-slate-500 dark:text-slate-500' 
+                      : 'text-slate-900 dark:text-slate-100'
                   }`}>
                     {task.name}
                   </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-slate-600 dark:text-violet-300 font-medium">
                     {task.category}
                   </p>
                 </div>
                 {task.completed && (
-                  <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center shadow-md">
                     <span className="text-white text-xs">✓</span>
                   </div>
                 )}

@@ -277,24 +277,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
   console.log('Dashboard showing main content');
 
-  // Coming Soon Overlay Component
-  const ComingSoonOverlay = ({ children }: { children: React.ReactNode }) => (
-    <div className="relative">
-      {children}
-      <div className="absolute inset-0 bg-black/10 dark:bg-gray-900/30 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
-        <div className="bg-white/20 dark:bg-gray-800/40 backdrop-blur-md rounded-lg border border-violet-200/50 dark:border-violet-700/50 px-6 py-4 shadow-lg">
-          <p className="text-violet-600 dark:text-violet-400 text-lg font-medium text-center">
-            Coming Soon
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
       {/* Header */}
-      <header className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-b border-purple-200 dark:border-purple-700 shadow-lg sticky top-0 z-40 transition-colors duration-300 w-full">
+      <header className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-b border-purple-200 dark:border-purple-700 shadow-lg sticky top-0 z-40 transition-colors duration-300 w-full">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
@@ -334,7 +320,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={() => setShowSettings(true)}
                 variant="ghost"
                 size="sm"
-                className="text-purple-700 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50"
+                className="text-purple-700 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50 transition-all duration-200 rounded-xl"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Settings</span>
@@ -343,7 +329,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 onClick={handleLogout}
                 variant="outline"
                 size="sm"
-                className="border-purple-200 dark:border-purple-700 text-purple-700 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50"
+                className="border-purple-200 dark:border-purple-700 text-purple-700 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50 transition-all duration-200 rounded-xl"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Logout</span>
@@ -360,11 +346,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
       {/* Navigation Tabs */}
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="flex flex-wrap gap-2 mb-6 overflow-x-auto">
+        <div className="flex flex-wrap gap-3 mb-6 overflow-x-auto">
           <Button
             onClick={() => setActiveTab('tasks')}
             variant={activeTab === 'tasks' ? 'default' : 'outline'}
-            className={activeTab === 'tasks' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+            className={`transition-all duration-200 rounded-xl font-medium ${activeTab === 'tasks' ? 
+              'bg-purple-600 hover:bg-purple-700 shadow-lg' : 
+              'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'
+            }`}
             size="sm"
           >
             Tasks & Progress
@@ -374,7 +363,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('calendar')}
                 variant={activeTab === 'calendar' ? 'default' : 'outline'}
-                className={activeTab === 'calendar' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+                className={`transition-all duration-200 rounded-xl font-medium ${activeTab === 'calendar' ? 
+                  'bg-purple-600 hover:bg-purple-700 shadow-lg' : 
+                  'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'
+                }`}
                 size="sm"
               >
                 Calendar
@@ -382,7 +374,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('teams')}
                 variant={activeTab === 'teams' ? 'default' : 'outline'}
-                className={activeTab === 'teams' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+                className={`transition-all duration-200 rounded-xl font-medium ${activeTab === 'teams' ? 
+                  'bg-purple-600 hover:bg-purple-700 shadow-lg' : 
+                  'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'
+                }`}
                 size="sm"
               >
                 Teams
@@ -390,7 +385,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Button
                 onClick={() => setActiveTab('partners')}
                 variant={activeTab === 'partners' ? 'default' : 'outline'}
-                className={activeTab === 'partners' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'}
+                className={`transition-all duration-200 rounded-xl font-medium ${activeTab === 'partners' ? 
+                  'bg-purple-600 hover:bg-purple-700 shadow-lg' : 
+                  'border-purple-200 dark:border-purple-700 text-purple-600 dark:text-violet-300 hover:bg-purple-50 dark:hover:bg-purple-800/50'
+                }`}
                 size="sm"
               >
                 Partners
@@ -434,18 +432,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         )}
 
         {activeTab === 'teams' && profile && (
-          <ComingSoonOverlay>
-            <TeamDashboard userPlan={profile.plan || 'free'} />
-          </ComingSoonOverlay>
+          <TeamDashboard userPlan={profile.plan || 'free'} />
         )}
 
         {activeTab === 'partners' && profile && (
-          <ComingSoonOverlay>
-            <div className="space-y-6">
-              <PartnerConnection userPlan={profile.plan || 'free'} />
-              <PartnerChat />
-            </div>
-          </ComingSoonOverlay>
+          <div className="space-y-6">
+            <PartnerConnection userPlan={profile.plan || 'free'} />
+            <PartnerChat />
+          </div>
         )}
       </main>
 
