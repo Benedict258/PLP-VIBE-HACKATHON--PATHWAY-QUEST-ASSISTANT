@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { NotificationsProvider } from "@/hooks/useNotifications";
@@ -9,6 +8,9 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Debug from "./pages/Debug";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+
+// Auto-refresh logic
+const VERSION = import.meta.env.VITE_APP_VERSION || '1.0.0';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -55,8 +57,19 @@ class ErrorBoundary extends React.Component<
 }
 
 function App() {
+  // 🔁 Auto-refresh logic
+  useEffect(() => {
+    const storedVersion = localStorage.getItem('app_version');
+    if (storedVersion && storedVersion !== VERSION) {
+      localStorage.setItem('app_version', VERSION);
+      window.location.reload();
+    } else {
+      localStorage.setItem('app_version', VERSION);
+    }
+  }, []);
+
   console.log('App component rendering...');
-  
+
   return (
     <ErrorBoundary>
       <ThemeProvider>
