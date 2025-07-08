@@ -6,9 +6,10 @@ interface WeeklyScheduleHoverProps {
   day: string;
   tasks: Task[];
   children: React.ReactNode;
+  disabled?: boolean;
 }
 
-const WeeklyScheduleHover = ({ day, tasks, children }: WeeklyScheduleHoverProps) => {
+const WeeklyScheduleHover = ({ day, tasks, children, disabled = false }: WeeklyScheduleHoverProps) => {
   const [showHover, setShowHover] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -29,7 +30,7 @@ const WeeklyScheduleHover = ({ day, tasks, children }: WeeklyScheduleHoverProps)
   };
 
   const handleInteraction = () => {
-    if (isMobile) {
+    if (isMobile && !disabled) {
       setShowHover(!showHover);
     }
   };
@@ -37,8 +38,8 @@ const WeeklyScheduleHover = ({ day, tasks, children }: WeeklyScheduleHoverProps)
   return (
     <div 
       className="relative"
-      onMouseEnter={() => !isMobile && setShowHover(true)}
-      onMouseLeave={() => !isMobile && setShowHover(false)}
+      onMouseEnter={() => !isMobile && !disabled && setShowHover(true)}
+      onMouseLeave={() => !isMobile && !disabled && setShowHover(false)}
       onClick={handleInteraction}
     >
       {children}

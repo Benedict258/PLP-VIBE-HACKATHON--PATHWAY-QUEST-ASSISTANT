@@ -185,25 +185,25 @@ const PartnerConnection = ({ userPlan }: PartnerConnectionProps) => {
 
   if (userPlan !== 'premium') {
     return (
-      <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-100">
+      <Card className="border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-50 to-indigo-100 dark:from-slate-800 dark:to-purple-900/20 rounded-2xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-blue-700">
-            <MessageCircle className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+            <MessageCircle className="w-6 h-6" />
             Partner Collaboration
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 sm:py-12">
-            <Users className="w-16 h-16 sm:w-20 sm:h-20 text-blue-300 mx-auto mb-4 sm:mb-6" />
+            <Users className="w-16 h-16 sm:w-20 sm:h-20 text-purple-300 mx-auto mb-4 sm:mb-6" />
             <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-3">
               Accountability Partners
             </h3>
             <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6 px-4">
               Connect with accountability partners and collaborate on goals
             </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6 max-w-md mx-auto">
-              <p className="text-blue-700 font-medium mb-2">🔒 Premium Feature</p>
-              <p className="text-sm sm:text-base text-blue-600">
+            <div className="bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700 rounded-xl p-4 sm:p-6 max-w-md mx-auto">
+              <p className="text-purple-700 dark:text-purple-300 font-medium mb-2">🔒 Premium Feature</p>
+              <p className="text-sm sm:text-base text-purple-600 dark:text-purple-400">
                 Upgrade to Premium to connect with accountability partners
               </p>
             </div>
@@ -214,13 +214,13 @@ const PartnerConnection = ({ userPlan }: PartnerConnectionProps) => {
   }
 
   return (
-    <Card className="border-blue-200 bg-gradient-to-r from-white to-blue-50 shadow-lg">
-      <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-indigo-50">
-        <CardTitle className="flex items-center gap-2 text-blue-700">
-          <MessageCircle className="w-5 h-5" />
+    <Card className="border-purple-200 dark:border-purple-700 bg-gradient-to-r from-white to-purple-50 dark:from-slate-800 dark:to-purple-900/20 shadow-lg rounded-2xl">
+      <CardHeader className="pb-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-t-2xl">
+        <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+          <MessageCircle className="w-6 h-6" />
           Accountability Partners
         </CardTitle>
-        <p className="text-sm text-blue-600">
+        <p className="text-sm text-purple-600 dark:text-purple-400">
           Connect with up to 2 accountability partners to stay motivated
         </p>
       </CardHeader>
@@ -232,13 +232,13 @@ const PartnerConnection = ({ userPlan }: PartnerConnectionProps) => {
             value={newPartnerEmail}
             onChange={(e) => setNewPartnerEmail(e.target.value)}
             placeholder="Partner's email address"
-            className="flex-1 border-blue-200 focus:border-blue-400"
+            className="flex-1 border-purple-200 dark:border-purple-700 focus:border-purple-400 dark:bg-slate-700 dark:text-white rounded-xl transition-all duration-200"
             type="email"
           />
           <Button
             onClick={invitePartner}
             disabled={loading || !newPartnerEmail.trim() || partners.filter(p => p.status === 'accepted').length >= 2}
-            className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+            className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto rounded-xl transition-all duration-200"
           >
             <Plus className="w-4 h-4 mr-2" />
             Invite Partner
@@ -251,7 +251,7 @@ const PartnerConnection = ({ userPlan }: PartnerConnectionProps) => {
           
           {partners.length === 0 ? (
             <div className="text-center py-6 text-gray-500">
-              <Users className="w-12 h-12 text-blue-300 mx-auto mb-3" />
+              <Users className="w-12 h-12 text-purple-300 mx-auto mb-3" />
               <p>No partners yet</p>
               <p className="text-sm text-gray-400 mt-1">
                 Invite someone to be your accountability partner!
@@ -261,17 +261,17 @@ const PartnerConnection = ({ userPlan }: PartnerConnectionProps) => {
             partners.map((partner) => (
               <div
                 key={partner.id}
-                className="flex items-center justify-between p-4 bg-white rounded-lg border border-blue-100 hover:shadow-md transition-shadow"
+                className="flex items-center justify-between p-4 bg-white dark:bg-slate-700 rounded-xl border border-purple-100 dark:border-purple-700 hover:shadow-md transition-all duration-200"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <MessageCircle className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                    <MessageCircle className="w-5 h-5 text-purple-600 dark:text-purple-300" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-gray-900 dark:text-gray-100">
                       {partner.partner_name}
                     </p>
-                    <p className="text-sm text-gray-600">{partner.partner_email}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{partner.partner_email}</p>
                   </div>
                 </div>
                 
@@ -284,9 +284,9 @@ const PartnerConnection = ({ userPlan }: PartnerConnectionProps) => {
         </div>
 
         {/* Partnership Info */}
-        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-          <h4 className="font-medium text-blue-900 mb-2">Partnership Benefits</h4>
-          <ul className="text-sm text-blue-700 space-y-1">
+        <div className="bg-purple-50 dark:bg-purple-900/30 rounded-xl p-4 border border-purple-200 dark:border-purple-700">
+          <h4 className="font-medium text-purple-900 dark:text-purple-100 mb-2">Partnership Benefits</h4>
+          <ul className="text-sm text-purple-700 dark:text-purple-300 space-y-1">
             <li>• Real-time chat and collaboration</li>
             <li>• Shared task lists and progress tracking</li>
             <li>• Mutual accountability and motivation</li>

@@ -161,10 +161,10 @@ const InviteManager = () => {
   }
 
   return (
-    <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
+    <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-slate-800 dark:to-purple-900/20 border-purple-200 dark:border-purple-700 shadow-lg rounded-2xl">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-blue-700">
-          <Mail className="w-5 h-5" />
+        <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+          <Mail className="w-6 h-6" />
           Pending Invitations ({invites.length})
         </CardTitle>
       </CardHeader>
@@ -172,21 +172,21 @@ const InviteManager = () => {
         {invites.map((invite) => (
           <div
             key={invite.id}
-            className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-100 hover:shadow-md transition-shadow"
+            className="flex items-center justify-between p-3 bg-white dark:bg-slate-700 rounded-xl border border-purple-100 dark:border-purple-700 hover:shadow-md transition-all duration-200"
           >
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-full">
+              <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full">
                 {invite.type === 'team' ? (
-                  <Users className="w-4 h-4 text-blue-600" />
+                  <Users className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                 ) : (
-                  <MessageCircle className="w-4 h-4 text-blue-600" />
+                  <MessageCircle className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                 )}
               </div>
               <div>
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-gray-900 dark:text-gray-100">
                   {invite.type === 'team' ? 'Team Invitation' : 'Partnership Request'}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   From {invite.sender_name}
                   {invite.type === 'team' && invite.team_name && (
                     <span> to join "{invite.team_name}"</span>
@@ -198,7 +198,7 @@ const InviteManager = () => {
               <Button
                 onClick={() => handleInviteResponse(invite.id, 'accepted', invite.type, invite.team_id)}
                 size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white"
+                className="bg-green-600 hover:bg-green-700 text-white rounded-xl transition-all duration-200"
               >
                 <Check className="w-4 h-4 mr-1" />
                 Accept
@@ -207,7 +207,7 @@ const InviteManager = () => {
                 onClick={() => handleInviteResponse(invite.id, 'declined', invite.type)}
                 size="sm"
                 variant="outline"
-                className="border-red-200 text-red-600 hover:bg-red-50"
+                className="border-red-200 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all duration-200"
               >
                 <X className="w-4 h-4 mr-1" />
                 Decline

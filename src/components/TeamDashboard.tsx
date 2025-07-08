@@ -447,12 +447,12 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Team Creation */}
-      <Card className="border-blue-200 bg-gradient-to-r from-white to-blue-50 shadow-lg">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="flex items-center gap-2 text-blue-700 text-lg sm:text-xl">
-            <Users className="w-5 h-5" />
+      <Card className="border-purple-200 dark:border-purple-700 bg-gradient-to-r from-white to-purple-50 dark:from-slate-800 dark:to-purple-900/20 shadow-lg rounded-2xl">
+        <CardHeader className="pb-6">
+          <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300 text-xl">
+            <Users className="w-6 h-6" />
             Team Management
           </CardTitle>
         </CardHeader>
@@ -470,7 +470,7 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
 
       {/* Team Switcher - Horizontal Bar */}
       {teams.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex gap-3 overflow-x-auto pb-2">
           {teams.map((team) => (
             <div key={team.id} className="flex items-center gap-2 flex-shrink-0">
               <Button
@@ -478,9 +478,9 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                 onClick={() => setSelectedTeam(team)}
                 className={`whitespace-nowrap ${
                   selectedTeam?.id === team.id 
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                    : 'hover:bg-blue-50 border-blue-200 text-blue-600'
-                }`}
+                    ? 'bg-purple-600 hover:bg-purple-700 text-white rounded-xl' 
+                    : 'hover:bg-purple-50 dark:hover:bg-purple-900/30 border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 rounded-xl'
+                } transition-all duration-200`}
               >
                 {team.name}
               </Button>
@@ -489,7 +489,7 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                   onClick={() => deleteTeam(team.id, team.name)}
                   variant="ghost"
                   size="sm"
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded-xl transition-all duration-200"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -501,19 +501,19 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
 
       {/* Selected Team Dashboard */}
       {selectedTeam && (
-        <Card className="border-blue-200 bg-gradient-to-br from-white to-blue-50 shadow-lg">
-          <CardHeader className="pb-3 sm:pb-6 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <CardTitle className="flex items-center gap-2 text-blue-700">
-              <Users className="w-5 h-5" />
+        <Card className="border-purple-200 dark:border-purple-700 bg-gradient-to-br from-white to-purple-50 dark:from-slate-800 dark:to-purple-900/20 shadow-lg rounded-2xl">
+          <CardHeader className="pb-6 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-t-2xl">
+            <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+              <Users className="w-6 h-6" />
               {selectedTeam.name}
             </CardTitle>
             {/* Panel Switcher */}
-            <div className="flex gap-1 bg-white rounded-lg p-1 border border-blue-200">
+            <div className="flex gap-1 bg-white dark:bg-slate-800 rounded-xl p-1 border border-purple-200 dark:border-purple-700">
               <Button
                 variant={activePanel === 'tasks' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setActivePanel('tasks')}
-                className={`flex-1 ${activePanel === 'tasks' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'text-blue-600'}`}
+                className={`flex-1 rounded-lg transition-all duration-200 ${activePanel === 'tasks' ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30'}`}
               >
                 <CheckSquare className="w-4 h-4 mr-1" />
                 Tasks
@@ -522,7 +522,7 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                 variant={activePanel === 'members' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setActivePanel('members')}
-                className={`flex-1 ${activePanel === 'members' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'text-blue-600'}`}
+                className={`flex-1 rounded-lg transition-all duration-200 ${activePanel === 'members' ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30'}`}
               >
                 <Users className="w-4 h-4 mr-1" />
                 Members
@@ -531,7 +531,7 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                 variant={activePanel === 'chat' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setActivePanel('chat')}
-                className={`flex-1 ${activePanel === 'chat' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'text-blue-600'}`}
+                className={`flex-1 rounded-lg transition-all duration-200 ${activePanel === 'chat' ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30'}`}
               >
                 <MessageCircle className="w-4 h-4 mr-1" />
                 Chat
@@ -547,12 +547,12 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                     value={newTaskName}
                     onChange={(e) => setNewTaskName(e.target.value)}
                     placeholder="Add team task"
-                    className="flex-1 border-blue-200 focus:border-blue-400"
+                    className="flex-1 border-purple-200 dark:border-purple-700 focus:border-purple-400 dark:bg-slate-700 dark:text-white rounded-xl transition-all duration-200"
                   />
                   <Button
                     onClick={createTeamTask}
                     disabled={loading || !newTaskName.trim()}
-                    className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+                    className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto rounded-xl transition-all duration-200"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Task
@@ -562,22 +562,22 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {teamTasks.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
-                      <CheckSquare className="w-12 h-12 text-blue-300 mx-auto mb-3" />
+                      <CheckSquare className="w-12 h-12 text-purple-300 mx-auto mb-3" />
                       <p>No team tasks yet. Create your first task!</p>
                     </div>
                   ) : (
                     teamTasks.map((task) => (
                       <div
                         key={task.id}
-                        className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100 hover:shadow-md transition-shadow"
+                        className="flex items-center gap-3 p-3 bg-white dark:bg-slate-700 rounded-xl border border-purple-100 dark:border-purple-700 hover:shadow-md transition-all duration-200"
                       >
                         <input
                           type="checkbox"
                           checked={task.completed}
                           onChange={() => toggleTaskComplete(task.id, task.completed)}
-                          className="w-4 h-4 text-blue-600"
+                          className="w-4 h-4 text-purple-600 rounded"
                         />
-                        <span className={`flex-1 ${task.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                        <span className={`flex-1 ${task.completed ? 'line-through text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>
                           {task.name}
                         </span>
                       </div>
@@ -594,12 +594,12 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                     value={newMemberEmail}
                     onChange={(e) => setNewMemberEmail(e.target.value)}
                     placeholder="Member email address"
-                    className="flex-1 border-blue-200 focus:border-blue-400"
+                    className="flex-1 border-purple-200 dark:border-purple-700 focus:border-purple-400 dark:bg-slate-700 dark:text-white rounded-xl transition-all duration-200"
                   />
                   <Button
                     onClick={inviteTeamMember}
                     disabled={loading || !newMemberEmail.trim()}
-                    className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+                    className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto rounded-xl transition-all duration-200"
                   >
                     <Mail className="w-4 h-4 mr-2" />
                     Invite
@@ -610,14 +610,14 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
                   {teamMembers.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-100 hover:shadow-md transition-shadow"
+                      className="flex items-center justify-between p-3 bg-white dark:bg-slate-700 rounded-xl border border-purple-100 dark:border-purple-700 hover:shadow-md transition-all duration-200"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">
+                        <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center text-sm font-medium text-purple-600 dark:text-purple-300">
                           {getInitials(getMemberDisplayName(member))}
                         </div>
                         <div>
-                          <p className="font-medium text-sm text-gray-900">{getMemberDisplayName(member)}</p>
+                          <p className="font-medium text-sm text-gray-900 dark:text-gray-100">{getMemberDisplayName(member)}</p>
                           <div className="flex items-center gap-1 text-xs">
                             {member.role === 'admin' && (
                               <>
@@ -648,7 +648,7 @@ const TeamDashboard = ({ userPlan }: TeamDashboardProps) => {
 
             {activePanel === 'chat' && (
               <div className="text-center py-8 text-gray-500">
-                <MessageCircle className="w-12 h-12 text-blue-300 mx-auto mb-3" />
+                <MessageCircle className="w-12 h-12 text-purple-300 mx-auto mb-3" />
                 <p>Team chat coming soon!</p>
                 <p className="text-sm text-gray-400 mt-2">
                   Real-time team collaboration features in development

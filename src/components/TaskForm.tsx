@@ -136,17 +136,17 @@ const TaskForm = ({ onTaskAdded }: TaskFormProps) => {
               onChange={(e) => setTaskName(e.target.value)}
               placeholder="Enter task name"
               required
-              className="border-purple-200 dark:border-purple-700 focus:border-purple-400 focus:ring-purple-400 dark:bg-gray-700 dark:text-white transition-colors"
+              className="border-purple-200 dark:border-purple-700 focus:border-purple-400 focus:ring-purple-400 dark:bg-gray-700 dark:text-white transition-colors rounded-xl"
             />
           </div>
 
           <div className="space-y-2">
             <Label className="text-purple-700 dark:text-purple-300 font-medium">Category</Label>
             <Select value={category} onValueChange={setCategory} required>
-              <SelectTrigger className="border-purple-200 dark:border-purple-700 focus:border-purple-400 focus:ring-purple-400 dark:bg-gray-700 dark:text-white">
+              <SelectTrigger className="border-purple-200 dark:border-purple-700 focus:border-purple-400 focus:ring-purple-400 dark:bg-gray-700 dark:text-white rounded-xl">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-purple-700">
+              <SelectContent className="dark:bg-gray-800 dark:border-purple-700 rounded-xl">
                 {categories.map((cat) => (
                   <SelectItem key={cat.id} value={cat.name} className="dark:text-white dark:focus:bg-purple-700">
                     <div className="flex items-center gap-2">
@@ -168,10 +168,10 @@ const TaskForm = ({ onTaskAdded }: TaskFormProps) => {
               Day
             </Label>
             <Select value={day} onValueChange={setDay} required>
-              <SelectTrigger className="border-purple-200 dark:border-purple-700 focus:border-purple-400 focus:ring-purple-400 dark:bg-gray-700 dark:text-white">
+              <SelectTrigger className="border-purple-200 dark:border-purple-700 focus:border-purple-400 focus:ring-purple-400 dark:bg-gray-700 dark:text-white rounded-xl">
                 <SelectValue placeholder="Select day" />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-purple-700">
+              <SelectContent className="dark:bg-gray-800 dark:border-purple-700 rounded-xl">
                 {days.map((d) => (
                   <SelectItem key={d} value={d} className="dark:text-white dark:focus:bg-purple-700">
                     {d}

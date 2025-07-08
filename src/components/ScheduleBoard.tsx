@@ -183,7 +183,7 @@ const ScheduleBoard = ({ tasks, onTasksChange }: ScheduleBoardProps) => {
     const isExpanded = expandedDays[day];
     
     return (
-      <WeeklyScheduleHover key={day} day={day} tasks={dayTasks}>
+      <WeeklyScheduleHover key={day} day={day} tasks={dayTasks} disabled={isExpanded}>
         <div className="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 border border-violet-200/50 dark:border-violet-400/20 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm hover:scale-[1.02]">
           <h3 className="font-semibold text-lg text-violet-800 dark:text-violet-300 mb-4 text-center">
             {day}
