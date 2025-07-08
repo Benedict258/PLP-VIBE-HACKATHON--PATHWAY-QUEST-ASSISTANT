@@ -245,7 +245,9 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   // Add debugging render
   console.log('Dashboard render state:', { loading, showPlanSelection, showWorkspaceSetup, profile, user });
 
+  // Add early returns with better debugging
   if (loading) {
+    console.log('Dashboard showing loading state');
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-purple-50 via-purple-100 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-colors duration-300">
         <div className="text-center">
@@ -257,12 +259,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   }
 
   if (showWorkspaceSetup) {
+    console.log('Dashboard showing workspace setup');
     return (
       <WorkspaceSetup onSetupComplete={handleWorkspaceSetup} />
     );
   }
 
   if (showPlanSelection) {
+    console.log('Dashboard showing plan selection');
     return (
       <PlanSelection 
         currentPlan={profile?.plan || 'free'} 
@@ -270,6 +274,8 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       />
     );
   }
+
+  console.log('Dashboard showing main content');
 
   // Always render something visible - this is critical for preventing blank screens
   return (
