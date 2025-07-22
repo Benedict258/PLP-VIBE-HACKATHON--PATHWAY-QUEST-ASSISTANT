@@ -11,7 +11,7 @@ function App() {
         if (prev <= 1) {
           setIsRedirecting(true);
           setTimeout(() => {
-            window.location.href = 'https://plp-vibe-hackathon-pathway-quest.onrender.com/';
+            window.location.href = 'https://pathway-quest.onrender.com/';
           }, 500);
           return 0;
         }
@@ -23,7 +23,7 @@ function App() {
   }, []);
 
   const handleContinue = () => {
-    window.location.href = 'https://plp-vibe-hackathon-pathway-quest.onrender.com/';
+    window.location.href = 'https://pathway-quest.onrender.com/';
   };
 
   return (
